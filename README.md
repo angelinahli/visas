@@ -13,15 +13,18 @@ I'm making this app to satisfy my own desire to explore and tinker with this dat
 ### To dos
 * Clean all the data:
     * Transform y-n-v into a long dataset on the y-n-v level
-    * Transform y-v data into a usable data format, and then into a long dataset on the y-v level
 
 #### Data Documentation
 (1) Workload (Issued, Refused, and Waived/Overcome) by visa category and year
-    * Source: See [Nonimmigrant Worldwide Issuance and Refusal Date by Visa Category](https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics/nonimmigrant-visa-statistics.html)
-    * Cleaning steps:
-        * Download each years' data as a PDF
-        * Use the built-in OCR reader in Nuance Power PDF to convert each document to an Excel sheet
-        * For each document, check that the # visas issued + # visas refused = total workload, and manually audit 10% of the numbers (including any rows that failed the previous check)
-        * Import into R and clean each worksheet, and convert into a year-category level dataset.
+    
+* Source: See [Nonimmigrant Worldwide Issuance and Refusal Date by Visa Category](https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics/nonimmigrant-visa-statistics.html)
+* Cleaning steps:
+    * Download each years' data as a PDF
+    * Use the built-in OCR reader in Nuance Power PDF to convert each document to an Excel sheet
+    * For each document, check that the # visas issued + # visas refused = total workload, and manually audit 10% of the numbers (including any rows that failed the previous check)
+    * Import into R and clean each worksheet, and convert into a year-category level dataset.
 
-(2) 
+(2) Issuances by visa category, year and nationality
+
+* Source: See [Nonimmigrant Visa Issuances by Visa Class and by Nationality](https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics/nonimmigrant-visa-statistics.html)
+* Cleaning steps: Download data, import each worksheet into R and convert into a year-category-nationality level dataset.
