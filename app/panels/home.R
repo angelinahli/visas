@@ -13,10 +13,8 @@ home_ui <- function() {
     
     title = "Home", 
     value = "Home",
-    fluidRow(
-      column(10, h3("Welcome to the Non-Immigrant Visa Data Explorer!"))
-    )
-    
+    h3("Welcome to the Non-Immigrant Visa Data Explorer!")
+
   )
 }
 

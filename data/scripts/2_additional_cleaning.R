@@ -110,7 +110,20 @@ sources <- data.table(
 )
 
 labels <- left_join(labels, sources, by=c("Short.Description.Source"="URL") )
+
+
+###### Reorder and relabel datasets ######
+
 labels <- labels[ , c("Visa.Category", "Short.Description", "Source") ]
+colnames(labels) <- c("visa_category", "description", "source")
+
+workload <- workload[ , c("year", "visa_category", "issued", "refused", "workload", 
+                          "waived_overcome", "perc_issued", "perc_granted") ]
+workload <- workload[ order(year, visa_category) ]
+
+regional <- regional[ , c("year", "visa_category", "nationality", "region", 
+                          "issued", "is_total") ]
+regional <- regional[ order(year, visa_category, nationality) ]
 
 ###### Finally, save all datasets ######
 
