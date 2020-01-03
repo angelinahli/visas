@@ -57,6 +57,9 @@ import_sheet <- function(filename, sheet_name, year) {
   df$nationality <- factor(df$nationality)
   df <- gather(df, key="visa_category", value="issued", -nationality, -region, -is_total, factor_key = T)
   
+  ## clean visa_category
+  df$visa_category <- gsub("-", "", df$visa_category)
+  
   df$year <- year
   return(df)
 }
@@ -117,15 +120,15 @@ for(cat in unique(overall_df$visa_category)) {
     print(paste0("The category '", cat, "' is missing from years: ", paste(missing, collapse=", ")))
   }
 }
-# [1] "The category 'D-CREW' is missing from years: 2014, 2015, 2016, 2017, 2018"
-# [1] "The category 'H-1A' is missing from years: 2014, 2015, 2016, 2017, 2018"
-# [1] "The category 'H-2R' is missing from years: 2013, 2014, 2015, 2016, 2017, 2018"
-# [1] "The category 'Q-2' is missing from years: 2014, 2015, 2016, 2017, 2018"
-# [1] "The category 'Q-3' is missing from years: 2014, 2015, 2016, 2017, 2018"
-# [1] "The category 'V-1' is missing from years: 2014, 2015, 2016, 2017, 2018"
-# [1] "The category 'V-2' is missing from years: 2014, 2015, 2016, 2017, 2018"
-# [1] "The category 'V-3' is missing from years: 2014, 2015, 2016, 2017, 2018"
-# [1] "The category 'T-6' is missing from years: 2013"
+# [1] "The category 'DCREW' is missing from years: 2014, 2015, 2016, 2017, 2018"
+# [1] "The category 'H1A' is missing from years: 2014, 2015, 2016, 2017, 2018"
+# [1] "The category 'H2R' is missing from years: 2013, 2014, 2015, 2016, 2017, 2018"
+# [1] "The category 'Q2' is missing from years: 2014, 2015, 2016, 2017, 2018"
+# [1] "The category 'Q3' is missing from years: 2014, 2015, 2016, 2017, 2018"
+# [1] "The category 'V1' is missing from years: 2014, 2015, 2016, 2017, 2018"
+# [1] "The category 'V2' is missing from years: 2014, 2015, 2016, 2017, 2018"
+# [1] "The category 'V3' is missing from years: 2014, 2015, 2016, 2017, 2018"
+# [1] "The category 'T6' is missing from years: 2013"
 
 # Seems largely consistent - for now, just update the 'Grand Total' name
 ## Maybe drop the Total Visas category since it currently is the same as the Grand Total

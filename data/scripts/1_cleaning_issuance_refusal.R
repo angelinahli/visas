@@ -47,7 +47,10 @@ import_all_sheets <- function(import_fn, year) {
   }
   
   ## identified via audit
+  ### remove trailing or leading *s
   df$visa_category <- gsub("^\\*+|\\*+$", "", df$visa_category)
+  ### remove internal -s
+  df$visa_category <- gsub("-", "", df$visa_category)
   
   # fix cases where numeric columns are in fact characters
   for(col in c("issued", "refused", "workload", "waived_overcome")) {
@@ -96,7 +99,7 @@ for(cat in unique(overall_df$visa_category)) {
 ## results:
 # [1] "The category 'F3' is missing from years: 2016, 2017, 2018"
 # [1] "The category 'M3' is missing from years: 2016, 2017, 2018"
-# [1] "The category 'T1' is missing from years: 2013, 2015, 2016, 2018"
+# [1] "The category 'T1' is missing from years: 2013, 2015, 2016, 2019"
 # [1] "The category 'T6' is missing from years: 2013, 2014"
 
-saveRDS(overall_df, file.path(output_path, "issuance_refusal.rds"))
+saveRDS(overall_df, file.path(output_path, "workload.rds"))
