@@ -51,7 +51,7 @@ I'm making this app to satisfy my own desire to explore and tinker with this dat
 
 * Sources:
     * [travel.state.gov List of Nonimmigrant Visa Symbols](data/input/NonimmigrantVisaSymbols.pdf), also available to download [here](https://travel.state.gov/content/dam/visas/Statistics/Non-Immigrant-Statistics/MonthlyNIVIssuances/Nonimmigrant%20Visa%20Symbols.pdf).
-    * [travel.state.gov 2004-2008 Table of Nonimmigrant Visas Issued by Classification](data/input/FY08-AR-TableXVIB.pdf), also available to download [here](https://travel.state.gov/content/dam/visas/Statistics/FY08-AR-TableXVI%28B%29.pdf)
+    * [travel.state.gov 2004-2008 Table of Nonimmigrant Visas Issued by Classification](data/input/FY08-AR-TableXVIB.pdf), also available to download [here](https://travel.state.gov/content/dam/visas/Statistics/FY08-AR-TableXVI%28B%29.pdf).
     * [travel.state.gov Border Crossing Card Info Page](https://travel.state.gov/content/travel/en/us-visas/tourism-visit/border-crossing-card.html)
 * Relevant cleaning script: [2_additional_cleaning.R](data/scripts/2_additional_cleaning.R)
 * Cleaning steps:
