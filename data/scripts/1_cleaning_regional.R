@@ -22,9 +22,10 @@ library(zoo)
 
 ###### Defining Paths ######
 
-base_path   <- file.path("C:/Users/ali2/Desktop/visas/data")
-input_path  <- file.path(base_path, "input")
-output_path <- file.path(base_path, "output")
+base_path     <- file.path("C:/Users/ali2/Desktop/visas/data")
+input_path    <- file.path(base_path, "input")
+intermed_path <- file.path(base_path, "intermediate")
+output_path   <- file.path(base_path, "output")
 
 setwd(base_path)
 
@@ -163,4 +164,4 @@ for(yr in 1999:2018) {
   print(paste0("Done with year ", yr))
 }
 
-saveRDS(overall_df, file.path(output_path, "regional.rds"))
+saveRDS(overall_df, file.path(intermed_path, "regional.rds"))

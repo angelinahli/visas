@@ -27,8 +27,8 @@ output_path   <- file.path(base_path, "output")
 
 ###### Load in Data ######
 
-regional <- data.table(readRDS(file.path(output_path, "regional.rds")))
-workload <- data.table(readRDS(file.path(output_path, "workload.rds")))
+regional <- data.table(readRDS(file.path(intermed_path, "regional.rds")))
+workload <- data.table(readRDS(file.path(intermed_path, "workload.rds")))
 
 ###### Create visa category crosswalk ######
 
@@ -75,13 +75,46 @@ wl_reference <- wl_reference[ order(year, visa_category, issued), ]
 wl_reference$year <- as.integer(wl_reference$year)
 wl_reference[ , key := paste0(year, " ", visa_category) ]
 
-
 rg_reference <- regional[ 
-  region == "Total" & 
-    year %in% unique(wl_reference$year) & 
-    visa_category %in% unique(wl_reference$visa_category), 
+  region == "Total", 
   c("year", "visa_category", "issued")]
-rg_reference <- rg_reference[ order(year, visa_category, issued) ]
 rg_reference[ , key := paste0(year, " ", visa_category) ]
+rg_reference[ , issued := round(issued) ] # this will probably cause problems with .5s unfortunatelt
+rg_reference <- rg_reference[ key %in% wl_reference$key, ]
+rg_reference <- rg_reference[ order(year, visa_category, issued) ]
 
 print(all_equal(wl_reference, rg_reference))
+
+###### Create some helper variables ######
+
+workload[ , perc_issued := issued / workload ]
+workload[ , perc_granted := pmin(1, ( (issued + waived_overcome) / workload )) ]
+
+# no rows where issued > granted, as should be accurate
+print(nrow(workload[ perc_issued > perc_granted, ]))
+
+# only 31 rows where there were no waived_overcome
+print(nrow(workload[ perc_issued == perc_granted, ]))
+print(nrow(workload[ waived_overcome == 0, ]))
+
+###### Create clean reference dictionary for label sources ######
+
+sources <- data.table(
+  Source = c("[A]", "[B]", "[C]"),
+  Description = c("List of Nonimmigrant Visa Symbols (See GitHub README)",
+                  "2004-2008 Table of Nonimmigrant Visas Issued by Classification (See GitHub README)",
+                  "Border Crossing Card Info Page"),
+  URL = c("https://travel.state.gov/content/dam/visas/Statistics/Non-Immigrant-Statistics/MonthlyNIVIssuances/Nonimmigrant%20Visa%20Symbols.pdf",
+          "https://travel.state.gov/content/dam/visas/Statistics/FY08-AR-TableXVI(B).pdf",
+          "https://travel.state.gov/content/travel/en/us-visas/tourism-visit/border-crossing-card.html")
+)
+
+labels <- left_join(labels, sources, by=c("Short.Description.Source"="URL") )
+labels <- labels[ , c("Visa.Category", "Short.Description", "Source") ]
+
+###### Finally, save all datasets ######
+
+saveRDS(workload, file.path(output_path, "workload.rds"))
+saveRDS(regional, file.path(output_path, "regional.rds"))
+saveRDS(sources, file.path(output_path, "label_sources.rds"))
+saveRDS(labels, file.path(output_path, "labels.rds"))
