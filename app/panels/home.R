@@ -4,6 +4,7 @@
 ## R version:   3.3.3
 ## Description: Contains UI and server code managing home page
 ##              Contains top-level home_ui and home_server functions
+##              All internal functions are prepended with 'home'
 
 ###### UI ######
 

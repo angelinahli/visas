@@ -8,13 +8,23 @@
 
 library(shiny)
 library(shinyBS)
+library(shinythemes)
 library(ggplot2)
 library(data.table)
+library(DT)
 library(dplyr)
+library(emo)
 
-###### Defining Paths and Helpers ######
+###### Defining Paths and Importing Data ######
 
-data_path <- file.path("..", "data")
+data_path <- file.path("..", "data", "output")
+
+label_sources <- data.table(readRDS(file.path(data_path, "label_sources.rds")))
+labels <- data.table(readRDS(file.path(data_path, "labels.rds")))
+regional <- data.table(readRDS(file.path(data_path, "regional.rds")))
+workload <- data.table(readRDS(file.path(data_path, "workload.rds")))
+
+###### Sourcing Panel Helper Functions ######
 
 source(file.path("panels", "home.R"), local=TRUE)$value
 source(file.path("panels", "summary.R"), local=TRUE)$value
@@ -23,21 +33,28 @@ source(file.path("panels", "workload.R"), local=TRUE)$value
 source(file.path("panels", "regional.R"), local=TRUE)$value
 
 ###### Defining UI ######
-ui <- fluidPage(
-  titlePanel("US Non-immigrant Visa Data"),
-  
-  tabsetPanel(
-    type="pills",
-    
-    home_ui(),
-    summary_ui(),
-    issuances_ui(),
-    workload_ui(),
-    regional_ui()
 
-  )
+ui <- fluidPage(
+  theme = shinytheme("simplex"),
   
-  # source_local_value(file.path(ui_path, "pathname.R")),
+  h2(emo::ji("red_heart"), "US Non-Immigrant Visa Data Explorer", emo::ji("blue_heart")),
+  p("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " on Jan 2020", 
+    emo::ji("diamond_shape_with_a_dot_inside"),
+    a(href="https://github.com/angelinahli/visas/", "Source code")),
+  hr(),
+  
+  div(
+    tabsetPanel(
+      type="pills",
+      
+      home_ui(),
+      summary_ui(),
+      issuances_ui(),
+      workload_ui(),
+      regional_ui()
+      
+    )
+  )
 )
 
 ###### Defining Server ######

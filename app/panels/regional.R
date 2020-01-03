@@ -4,6 +4,7 @@
 ## R version:   3.3.3
 ## Description: Contains UI and server code managing regional page
 ##              Contains top-level regional_ui and regional_server functions
+##              All internal functions are prepended with 'regional'
 
 ###### UI ######
 

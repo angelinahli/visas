@@ -4,6 +4,7 @@
 ## R version:   3.3.3
 ## Description: Contains UI and server code managing workload page
 ##              Contains top-level workload_ui and workload_server functions
+##              All internal functions are prepended with 'workload'
 
 ###### UI ######
 

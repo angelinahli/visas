@@ -4,6 +4,7 @@
 ## R version:   3.3.3
 ## Description: Contains UI and server code managing issuances page
 ##              Contains top-level issuances_ui and issuances_server functions
+##              All internal functions are prepended with 'issuances'
 
 ###### UI ######
 
