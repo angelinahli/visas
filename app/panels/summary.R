@@ -53,7 +53,9 @@ summary_ui_download_tab <- function() {
     downloadButton("summary_download_data", "Download"),
     
     hr(),
-  
+    
+    uiOutput("summary_download_title"),
+    br(),
     DT::dataTableOutput("summary_download_table")
     
   )
@@ -108,4 +110,8 @@ summary_server_download_tab <- function(input, output, session) {
       write.csv(dataset_input(), file)
     }
   )
+  
+  output$summary_download_title <- renderUI({
+    HTML(paste0("<h4>", input$summary_download_dataset, "</h4>"))
+  })
 }
