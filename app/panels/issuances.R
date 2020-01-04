@@ -10,21 +10,26 @@
 
 issuances_ui <- function() {
   tabPanel(
-    
-    title = "Overall Issuances", 
-    value = "Overall Issuances",
-    
+    "Overall Issuances", 
     tabsetPanel(
-      
       type = "tabs",
-      
-      tabPanel("Overall"),
-      tabPanel("Evolution"),
-      tabPanel("Detailed Breakdown")
-      
+      issuances_ui_overall(),
+      issuances_ui_evolution(),
+      issuances_ui_breakdown()
     )
-    
   )
+}
+
+issuances_ui_overall <- function() {
+  tabPanel("Overall")
+}
+
+issuances_ui_evolution <- function() {
+  tabPanel("Evolution")
+}
+
+issuances_ui_breakdown <- function() {
+  tabPanel("Detailed Breakdown")
 }
 
 ###### Server ######

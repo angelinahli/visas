@@ -29,7 +29,7 @@ summary_ui_visas_tab <- function() {
     
     DT::dataTableOutput("summary_visa_table"),
     
-    h4("Sources:"),
+    h4("Sources"),
     uiOutput("summary_sources")
   )
 }
@@ -70,7 +70,7 @@ summary_server <- function(input, output, session) {
 
 summary_server_visas_tab <- function(input, output, session) {
   output$summary_visa_table <- DT::renderDataTable({
-    colnames(labels) <- c("Visa Category", "Short Description", "Source")
+    colnames(labels) <- c("Visa Category", "Description", "Source")
     labels
   })
   

@@ -43,7 +43,7 @@ ui <- fluidPage(
            
            ## heading
            h2(emo::ji("red_heart"), "US Non-Immigrant Visa Data Explorer", emo::ji("blue_heart")),
-           p("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " on Jan 2020", 
+           p("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " in Jan 2020", 
              emo::ji("diamond_shape_with_a_dot_inside"),
              a(href="https://github.com/angelinahli/visas/", "Source code")),
            hr(),
@@ -64,8 +64,7 @@ ui <- fluidPage(
            
     )
   )
-  
-  
+    
 )
 
 ###### Defining Server ######
