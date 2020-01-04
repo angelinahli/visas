@@ -123,7 +123,7 @@ workload <- workload[ order(year, visa_category) ]
 
 regional <- regional[ , c("year", "visa_category", "nationality", "region", 
                           "issued", "is_total") ]
-regional <- regional[ order(year, visa_category, nationality) ]
+regional <- regional[ order(year, visa_category, region, nationality) ]
 
 ###### Finally, save all datasets ######
 
