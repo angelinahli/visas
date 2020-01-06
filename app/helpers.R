@@ -30,19 +30,27 @@ get_visa_select <- function(dt, select_id, selected=c("Total")) {
                         multiple = TRUE)
 }
 
-get_rendered_visa_notes <- function(categories) {
-  labels_subset <- labels[visa_category %in% categories, ]
-  if(nrow(labels_subset) != 0) {
-    header <- ifelse(nrow(labels_subset) > 1, "<h4>Notes</h4>", "<h4>Note</h4>")
-    all_text <- c(header, "<ul>")
-
+get_notes_html <- function(visa_categories = c(), additional_notes = c()) {
+  # prints out standard notes on visa categories, as well as any additional
+  # notes
+  labels_subset <- labels[visa_category %in% visa_categories, ]
+  # if there are any notes to print
+  if(nrow(labels_subset) > 0 | length(additional_notes) > 0) {
+    
+    notes <- c()
+    for(note in additional_notes) {
+      new_bullet <- sprintf("<li>%s</li>", note)
+      notes <- c(notes, new_bullet)
+    }
     for(cat in unique(labels_subset$visa_category)) {
       label <- labels_subset[ visa_category == cat, description ]
       new_bullet <- sprintf("<li>The symbol '%s' refers to: %s</li>", cat, label)
-      all_text <- c(all_text, new_bullet)
+      notes <- c(notes, new_bullet)
     }
     
-    all_text <- c(all_text, "</ul>")
+    header <- ifelse(length(notes) > 1, "<h4>Notes</h4>", "<h4>Note</h4>")
+    all_text <- c(header, "<ul>", notes, "</ul>")
+    
     HTML(paste(all_text, collapse = ""))
   }
 }

@@ -126,7 +126,7 @@ issuances_server_overall <- function(input, output, session) {
     top_rows <- head(grouped, num_categories + 1)
     top_rows$visa_category <- as.character(top_rows$visa_category)
     other_count_df <- grouped %>% 
-                      dplyr::filter(!(visa_category %in% unique(top_rows$visa_category))) %>%
+                      filter(!(visa_category %in% unique(top_rows$visa_category))) %>%
                       summarise(issued = sum(issued))
     other_row <- list(visa_category="Other", issued=other_count_df$issued)
     all_data <- rbind(top_rows, other_row)
@@ -146,7 +146,7 @@ issuances_server_overall <- function(input, output, session) {
   })
   
   output$issuances_overall_notes <- renderUI({
-    get_rendered_visa_notes(categories())
+    get_notes_html(visa_categories = categories())
   })
   
 }
@@ -180,7 +180,7 @@ issuances_server_evolution <- function(input, output, session) {
   })
   
   output$issuances_evolution_notes <- renderUI({
-    get_rendered_visa_notes(input$issuances_evolution_categories)
+    get_notes_html(visa_categories = input$issuances_evolution_categories)
   })
 }
 
@@ -217,20 +217,19 @@ issuances_server_breakdown <- function(input, output, session) {
   )
   
   output$issuances_breakdown_notes <- renderUI({
-    get_rendered_visa_notes(input$issuances_breakdown_categories)
+    get_notes_html(visa_categories = input$issuances_breakdown_categories)
   })
   
 }
 
 issuances_get_evolution_df <- function(year_min, year_max, categories) {
-  grouped <- regional %>% 
-    dplyr::filter(year >= year_min & year <= year_max & 
+  dt <- regional %>% 
+    filter(year >= year_min & year <= year_max & 
                     region == "Total" & visa_category %in% categories) %>%
     select(year, visa_category, issued) %>%
     group_by(year, visa_category) %>% 
     summarise(issued = sum(issued)) %>%
-    arrange(year, visa_category)
-  
-  wide_dt <- spread(grouped, visa_category, issued)
-  return(wide_dt)
+    arrange(year, visa_category) %>%
+    spread(visa_category, issued)
+  return(dt)
 }

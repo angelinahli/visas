@@ -88,7 +88,7 @@ print(all_equal(wl_reference, rg_reference))
 ###### Create some helper variables ######
 
 workload[ , perc_issued := issued / workload ]
-workload[ , perc_granted := pmin(1, ( (issued + waived_overcome) / workload )) ]
+workload[ , perc_granted := (issued + waived_overcome) / workload ]
 
 # no rows where issued > granted, as should be accurate
 print(nrow(workload[ perc_issued > perc_granted, ]))
