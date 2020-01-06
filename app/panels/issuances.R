@@ -41,7 +41,8 @@ issuances_ui_overall <- function() {
                     step=1)
       ),
       mainPanel(
-        plotlyOutput("issuances_overall_plot")
+        plotlyOutput("issuances_overall_plot"),
+        uiOutput("issuances_overall_notes")
       )
     )
     
@@ -66,7 +67,8 @@ issuances_ui_evolution <- function() {
                         selected=c("Total")) # not sure if there's another way?
       ),
       mainPanel(
-        plotlyOutput("issuances_evolution_plot")
+        plotlyOutput("issuances_evolution_plot"),
+        uiOutput("issuances_evolution_notes")
       )
     )
     
@@ -86,6 +88,7 @@ issuances_server <- function(input, output, session) {
 }
 
 issuances_server_overall <- function(input, output, session) {
+  categories <- reactiveVal(c())
   
   ## plot
   output$issuances_overall_plot <- renderPlotly({
@@ -102,11 +105,15 @@ issuances_server_overall <- function(input, output, session) {
                arrange(desc(issued))
     
     top_rows <- head(grouped, num_categories + 1)
+    top_rows$visa_category <- as.character(top_rows$visa_category)
     other_count_df <- grouped %>% 
                       dplyr::filter(!(visa_category %in% unique(top_rows$visa_category))) %>%
                       summarise(issued = sum(issued))
     other_row <- list(visa_category="Other", issued=other_count_df$issued)
     all_data <- rbind(top_rows, other_row)
+    
+    # save visa categories
+    categories(c(categories, as.character(all_data$visa_category)))
     
     # order:
     visa_order <- all_data$visa_category
@@ -115,7 +122,12 @@ issuances_server_overall <- function(input, output, session) {
     plot_ly(type = "bar", data = all_data, x = ~visa_category, y = ~issued) %>%
       layout(title = sprintf("Overall Visa Issuances (%s-%s)", year_min, year_max),
              yaxis = list(title = "# Issuances"),
-             xaxis = list(title = "Visa Category"))
+             xaxis = list(title = "Visa Category"),
+             hovermode = "compare")
+  })
+  
+  output$issuances_overall_notes <- renderUI({
+    get_rendered_visa_notes(categories())
   })
   
 }
@@ -138,19 +150,27 @@ issuances_server_evolution <- function(input, output, session) {
     
     wide_dt <- spread(grouped, visa_category, issued)
     
-    plot <- plot_ly(type = "scatter", mode = "lines", 
-                    data = wide_dt, 
-                    x = ~year, y = wide_dt[categories[1]], name = categories[1]) %>%
-              layout(title = sprintf("Visa Issuances Over Time (%s-%s)", year_min, year_max),
-                     yaxis = list(title = "# Issuances"),
-                     xaxis = list(title = "Year"))
-    for(cat in categories[-1]) {
-      plot <- plot %>% add_trace(y = wide_dt[cat], name = cat, mode = "lines")
-    }
+    title_categories <- ifelse(length(categories) == 1, 
+                               paste0("Visa Category: ", categories[1]), 
+                               "Selected Categories")
+    plot <- plot_ly() %>%
+            layout(title = sprintf("Visa Issuances Over Time (%s-%s)<br>%s", 
+                                   year_min, year_max, title_categories),
+                   yaxis = list(title = "# Issuances"),
+                   xaxis = list(title = "Year"),
+                   hovermode = "compare")
     
+    for(cat in categories) {
+      plot <- plot %>% add_trace(x = wide_dt[["year"]], y = wide_dt[[cat]], 
+                                 name = cat, type = "scatter", mode = "lines")
+    }
+
     plot    
   })
   
+  output$issuances_evolution_notes <- renderUI({
+    get_rendered_visa_notes(input$issuances_evolution_categories)
+  })
 }
 
 issuances_server_breakdown <- function(input, output, session) {

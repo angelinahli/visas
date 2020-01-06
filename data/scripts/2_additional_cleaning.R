@@ -113,13 +113,31 @@ labels <- left_join(labels, sources, by=c("Short.Description.Source"="URL") )
 
 ###### Make relevant variables factors ######
 
-###### TODO: Come back to this!
 get_visa_factor_levels <- function(dt) {
   levels <- sort(unique(labels$Visa.Category))
   levels <- levels[levels %in% unique(dt$visa_category)]
   levels <- c("Total", levels)
   return(levels)
 }
+
+get_nation_factor_levels <- function(dt) {
+  all_levels <- unique(dt$nationality)
+  level1 <- c("Total")
+  level2 <- as.character(sort(all_levels[grepl(" - Total$", all_levels)]))
+  sorted_levels <- c(level1, level2)
+  level3 <- as.character(sort(all_levels[!(all_levels %in% sorted_levels)]))
+  final <- c(sorted_levels, level3)
+  return(final)
+}
+
+
+workload$visa_category <- factor(workload$visa_category, get_visa_factor_levels(workload))
+regional$visa_category <- factor(regional$visa_category, get_visa_factor_levels(regional))
+regional$nationality <- factor(regional$nationality, get_nation_factor_levels(regional))
+
+region_levels <- c("Africa", "Asia", "Europe", "North America", "Oceania", 
+                   "South America", "Unknown", "Total")
+regional$region <- factor(regional$region, region_levels)
 
 ###### Reorder and relabel datasets ######
 

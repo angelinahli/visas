@@ -20,7 +20,7 @@ get_visa_select <- function(dt, select_id, selected=NA) {
   # return a select component with id select_id, with options sourced
   # from dt$visa_category
   # assume visa_category is a factor
-  choices <- sort(unique(dt$visa_category))
+  choices <- as.character(sort(unique(dt$visa_category)))
   selection <- choices
   if(!is.na(selected)) { selection <- selected }
   select <- pickerInput(select_id, label = "Visa Categories",
@@ -28,4 +28,21 @@ get_visa_select <- function(dt, select_id, selected=NA) {
                         selected = selection,
                         options = list(`actions-box` = TRUE),
                         multiple = TRUE)
+}
+
+get_rendered_visa_notes <- function(categories) {
+  labels_subset <- labels[visa_category %in% categories, ]
+  if(nrow(labels_subset) != 0) {
+    header <- ifelse(nrow(labels_subset) > 1, "<h4>Notes</h4>", "<h4>Note</h4>")
+    all_text <- c(header, "<ul>")
+
+    for(cat in unique(labels_subset$visa_category)) {
+      label <- labels_subset[ visa_category == cat, description ]
+      new_bullet <- sprintf("<li>The symbol '%s' refers to: %s</li>", cat, label)
+      all_text <- c(all_text, new_bullet)
+    }
+    
+    all_text <- c(all_text, "</ul>")
+    HTML(paste(all_text, collapse = ""))
+  }
 }
