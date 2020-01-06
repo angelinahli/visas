@@ -11,16 +11,16 @@ library(shinyBS)
 library(shinythemes)
 library(shinyWidgets)
 library(plotly)
-library(ggplot2)
 library(data.table)
 library(DT)
 library(dplyr)
+library(stringr)
 library(tidyr)
 library(emo)
 
 ###### Defining Paths and Importing Data ######
 
-data_path <- file.path("..", "data", "output")
+data_path <- file.path("data", "output")
 
 label_sources <- data.table(readRDS(file.path(data_path, "label_sources.rds")))
 labels <- data.table(readRDS(file.path(data_path, "labels.rds")))
