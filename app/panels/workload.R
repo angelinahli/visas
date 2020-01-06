@@ -76,7 +76,7 @@ workload_ui_breakdown <- function() {
 workload_get_stat_select <- function(select_id) {
   choices <- c(WORKLOAD_ISSUED_OPTION, WORKLOAD_GRANTED_OPTION)
   pickerInput(select_id, 
-              label = "Select Comparison Measure",
+              label = "Comparison Measure",
               choices = choices,
               selected = choices,
               options = list(`actions-box` = TRUE),
@@ -98,49 +98,52 @@ workload_server_evolution <- function(input, output, session) {
     categories <- input$workload_evolution_categories
     stats <- input$workload_evolution_stats
     
-    filtered <- workload %>%
-      filter(year >= year_min & year <= year_max & visa_category %in% categories)
-    
-    if(WORKLOAD_ISSUED_OPTION %in% stats) {
-      names(filtered)[names(filtered) == "perc_issued"] <- WORKLOAD_ISSUED_OPTION
+    if (length(stats) > 0) {
+      filtered <- workload %>%
+        filter(year >= year_min & year <= year_max & visa_category %in% categories)
+      
+      if(WORKLOAD_ISSUED_OPTION %in% stats) {
+        names(filtered)[names(filtered) == "perc_issued"] <- WORKLOAD_ISSUED_OPTION
+      }
+      if(WORKLOAD_GRANTED_OPTION %in% stats) {
+        names(filtered)[names(filtered) == "perc_granted"] <- WORKLOAD_GRANTED_OPTION
+      }
+      
+      subsection <- filtered %>%
+        select(c("year", "visa_category", stats)) %>%
+        # below from: https://stackoverflow.com/questions/30592094/r-spreading-multiple-columns-with-tidyr
+        gather(variable, value, -year, -visa_category) %>%
+        unite(temp, visa_category, variable, sep = " - ") %>%
+        spread(temp, value)
+      
+      visa_category_text <- ifelse(length(categories) == 1, 
+                                   paste0("Visa Category: ", categories[1]), 
+                                   "Selected Categories")
+      stats_text <- ifelse(length(stats) == 0, 
+                           "Issued", 
+                           paste0(str_replace_all(stats, "% ", ""), collapse = " and "))
+      title <- sprintf("Percentage Non-Immigrant Visas %s Over Time (%s-%s)<br>%s",
+                       stats_text,
+                       year_min, year_max,
+                       visa_category_text)
+      
+      y_title <- paste(stats, collapse = " and ")
+      y_title <- ifelse(y_title == "", "Percentage (%)", y_title)
+      
+      plot <- plot_ly() %>%
+        layout(title = title,
+               yaxis = list(title = y_title, tickformat = "%"),
+               xaxis = list(title = "Year"),
+               hovermode = "compare")
+      
+      for(col in colnames(subsection)[-1]) {
+        plot <- plot %>% add_trace(x = subsection[["year"]], y = subsection[[col]], 
+                                   name = col, type = "scatter", mode = "lines")
+      }
+      
+      plot
     }
-    if(WORKLOAD_GRANTED_OPTION %in% stats) {
-      names(filtered)[names(filtered) == "perc_granted"] <- WORKLOAD_GRANTED_OPTION
-    }
     
-    subsection <- filtered %>%
-      select(c("year", "visa_category", stats)) %>%
-      # below from: https://stackoverflow.com/questions/30592094/r-spreading-multiple-columns-with-tidyr
-      gather(variable, value, -year, -visa_category) %>%
-      unite(temp, visa_category, variable, sep = " - ") %>%
-      spread(temp, value)
-    
-    visa_category_text <- ifelse(length(categories) == 1, 
-                                 paste0("Visa Category: ", categories[1]), 
-                                 "Selected Categories")
-    stats_text <- ifelse(length(stats) == 0, 
-                         "Issued", 
-                         paste0(str_replace_all(stats, "% ", ""), collapse = " and "))
-    title <- sprintf("Percentage Visas %s Over Time (%s-%s)<br>%s",
-                     stats_text,
-                     year_min, year_max,
-                     visa_category_text)
-
-    y_title <- paste(stats, collapse = " and ")
-    y_title <- ifelse(y_title == "", "Percentage (%)", y_title)
-    
-    plot <- plot_ly() %>%
-      layout(title = title,
-             yaxis = list(title = y_title, tickformat = "%"),
-             xaxis = list(title = "Year"),
-             hovermode = "compare")
-    
-    for(col in colnames(subsection)[-1]) {
-      plot <- plot %>% add_trace(x = subsection[["year"]], y = subsection[[col]], 
-                                 name = col, type = "scatter", mode = "lines")
-    }
-    
-    plot
   })
   
   output$workload_evolution_notes <- renderUI({

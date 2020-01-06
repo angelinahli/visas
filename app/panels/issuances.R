@@ -139,7 +139,7 @@ issuances_server_overall <- function(input, output, session) {
     all_data$visa_category <- factor(all_data$visa_category, visa_order)
     
     plot_ly(type = "bar", data = all_data, x = ~visa_category, y = ~issued) %>%
-      layout(title = sprintf("Overall Visa Issuances (%s-%s)", year_min, year_max),
+      layout(title = sprintf("Overall Non-Immigrant Visa Issuances (%s-%s)", year_min, year_max),
              yaxis = list(title = "# Issuances"),
              xaxis = list(title = "Visa Category"),
              hovermode = "compare")
@@ -165,7 +165,7 @@ issuances_server_evolution <- function(input, output, session) {
                                paste0("Visa Category: ", categories[1]), 
                                "Selected Categories")
     plot <- plot_ly() %>%
-            layout(title = sprintf("Visa Issuances Over Time (%s-%s)<br>%s", 
+            layout(title = sprintf("Non-Immigrant Visa Issuances Over Time (%s-%s)<br>%s", 
                                    year_min, year_max, title_categories),
                    yaxis = list(title = "# Issuances"),
                    xaxis = list(title = "Year"),
