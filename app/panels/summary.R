@@ -72,7 +72,7 @@ summary_server_visas_tab <- function(input, output, session) {
   output$summary_visa_table <- DT::renderDataTable({
     colnames(labels) <- c("Visa Category", "Description", "Source")
     labels
-  })
+  }, rownames = FALSE)
   
   output$summary_sources <- renderUI({
     all_text <- c("<ul>")
@@ -100,7 +100,7 @@ summary_server_download_tab <- function(input, output, session) {
   
   output$summary_download_table <- DT::renderDataTable({
     head(dataset_input(), n = 20)
-  })
+  }, rownames = FALSE)
   
   output$summary_download_data <- downloadHandler(
     filename = function() {

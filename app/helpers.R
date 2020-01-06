@@ -16,7 +16,7 @@ get_year_slider <- function(dt, slider_id) {
   return(slider)
 }
 
-get_visa_select <- function(dt, select_id, selected=NA) {
+get_visa_select <- function(dt, select_id, selected=c("Total")) {
   # return a select component with id select_id, with options sourced
   # from dt$visa_category
   # assume visa_category is a factor

@@ -62,9 +62,7 @@ issuances_ui_evolution <- function() {
       sidebarPanel(
         p("Subset the data to see different plots."),
         get_year_slider(dt=regional, slider_id="issuances_evolution_year"),
-        get_visa_select(dt=regional, 
-                        select_id="issuances_evolution_categories",
-                        selected=c("Total")) # not sure if there's another way?
+        get_visa_select(dt=regional, select_id="issuances_evolution_categories")
       ),
       mainPanel(
         plotlyOutput("issuances_evolution_plot"),
@@ -76,7 +74,28 @@ issuances_ui_evolution <- function() {
 }
 
 issuances_ui_breakdown <- function() {
-  tabPanel("Detailed Breakdown")
+  tabPanel(
+    "Detailed Breakdown",
+    
+    h4("Visa Issuances Over Time"),
+    p("This tab explores the raw data on how visa issuances have changed",
+      "over time."),
+    br(),
+    
+    sidebarLayout(
+      sidebarPanel(
+        p("Subset the data to see and download different tables."),
+        get_year_slider(dt=regional, slider_id="issuances_breakdown_year"),
+        get_visa_select(dt=regional, select_id="issuances_breakdown_categories"),
+        downloadButton("issuances_breakdown_download", "Download the Data")
+      ),
+      mainPanel(
+        DT::dataTableOutput("issuances_breakdown_table"),
+        uiOutput("issuances_breakdown_notes")
+      )
+    )
+    
+  )
 }
 
 ###### Server ######
@@ -140,15 +159,7 @@ issuances_server_evolution <- function(input, output, session) {
     year_max <- input$issuances_evolution_year[2]
     categories <- input$issuances_evolution_categories
     
-    grouped <- regional %>% 
-               dplyr::filter(year >= year_min & year <= year_max & 
-                             region == "Total" & visa_category %in% categories) %>%
-               select(year, visa_category, issued) %>%
-               group_by(year, visa_category) %>% 
-               summarise(issued = sum(issued)) %>%
-               arrange(year, visa_category)
-    
-    wide_dt <- spread(grouped, visa_category, issued)
+    wide_dt <- issuances_get_evolution_df(year_min, year_max, categories)
     
     title_categories <- ifelse(length(categories) == 1, 
                                paste0("Visa Category: ", categories[1]), 
@@ -175,4 +186,51 @@ issuances_server_evolution <- function(input, output, session) {
 
 issuances_server_breakdown <- function(input, output, session) {
   
+  dataset <- reactiveVal(0)
+  
+  output$issuances_breakdown_table <- DT::renderDataTable({
+    ## parse input vars
+    year_min <- input$issuances_breakdown_year[1]
+    year_max <- input$issuances_breakdown_year[2]
+    categories <- input$issuances_breakdown_categories
+    
+    # set dataset attribute
+    df <- issuances_get_evolution_df(input$issuances_breakdown_year[1], 
+                                     input$issuances_breakdown_year[2], 
+                                     input$issuances_breakdown_categories)
+    colnames(df)[1] <- "Year"
+    dataset(df)
+    
+    # call atribute
+    DT::datatable(dataset(), rownames=FALSE, options = list(pageLength = nrow(dataset()))) %>% 
+      formatRound(-1, digits = 0)
+  })
+  
+  output$issuances_breakdown_download <- downloadHandler(
+    filename = function() {
+      sprintf("issuances_by_year_cat_%s-%s.csv", 
+              input$issuances_breakdown_year[1], input$issuances_breakdown_year[2])
+    },
+    content = function(file) {
+      write.csv(dataset(), file)
+    }
+  )
+  
+  output$issuances_breakdown_notes <- renderUI({
+    get_rendered_visa_notes(input$issuances_breakdown_categories)
+  })
+  
+}
+
+issuances_get_evolution_df <- function(year_min, year_max, categories) {
+  grouped <- regional %>% 
+    dplyr::filter(year >= year_min & year <= year_max & 
+                    region == "Total" & visa_category %in% categories) %>%
+    select(year, visa_category, issued) %>%
+    group_by(year, visa_category) %>% 
+    summarise(issued = sum(issued)) %>%
+    arrange(year, visa_category)
+  
+  wide_dt <- spread(grouped, visa_category, issued)
+  return(wide_dt)
 }
