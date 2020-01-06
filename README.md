@@ -46,7 +46,9 @@ I'm making this app to satisfy my own desire to explore and tinker with this dat
 
 #### (2) Issuances by visa category, year and nationality
 
-* Source: See [Nonimmigrant Visa Issuances by Visa Class and by Nationality](https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics/nonimmigrant-visa-statistics.html)
+* Sources: 
+    * See [Nonimmigrant Visa Issuances by Visa Class and by Nationality](https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics/nonimmigrant-visa-statistics.html)
+    * [Country ISO Codes Kaggle dataset](https://www.kaggle.com/juanumusic/countries-iso-codes/data)
 * Relevant cleaning script: [1_cleaning_regional.R](data/scripts/1_cleaning_regional.R) & [2_additional_cleaning.R](data/scripts/2_additional_cleaning.R)
 * Cleaning steps: Download data, import each worksheet into R and convert into a year-category-nationality level dataset.
 

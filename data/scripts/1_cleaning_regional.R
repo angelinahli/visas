@@ -72,7 +72,7 @@ for(year in 1999:2018) {
   all_dfs[[year]] <- import_sheet(filename, sheet_name, year)
 }
 
-overall_df <- rbindlist(all_dfs)
+overall_df <- data.table(rbindlist(all_dfs))
 
 ###### Updating country names for consistency ######
 
@@ -110,6 +110,66 @@ name_dictionary <- c(
 )
 for(old_name in names(name_dictionary)) {
   overall_df[ nationality == old_name, nationality := name_dictionary[old_name] ]
+}
+
+###### Merging on country codes ######
+
+codes <- data.table(read.csv(file.path(input_path, "wikipedia-iso-country-codes.csv")))
+
+overall_df <- data.table(
+  left_join(overall_df, codes[, c("English.short.name.lower.case", "Alpha.3.code")],
+            by = c("nationality" = "English.short.name.lower.case"))
+)
+
+## checking on cases that are non-unique matches
+missing_codes <- overall_df[ is.na(Alpha.3.code) & !grepl(" - Total$", nationality), 
+                             unique(nationality) ]
+# [1] "Cabo Verde"                            "Congo, Dem. Rep. of the (Kinshasa)"    "Congo, Rep. of the (Brazzaville)"     
+# [4] "Cote d'Ivoire"                         "Gambia, The"                           "Libya"                                
+# [7] "Eswatini"                              "Tanzania"                              "Brunei"                               
+# [10] "Burma"                                 "China - mainland"                      "China - Taiwan"                       
+# [13] "Hong Kong S.A.R."                      "Korea, North"                          "Korea, South"                         
+# [16] "Laos"                                  "Palestinian Authority Travel Document" "Syria"                                
+# [19] "Great Britain and Northern Ireland"    "Macedonia"                             "Moldova"                              
+# [22] "Serbia and Montenegro"                 "Vatican City"                          "Bahamas, The"                         
+# [25] "No Nationality"                        "United Nations Laissez-Passer"         "Total"                                
+# [28] "Macau S.A.R."                          "Kosovo"                                "South Sudan"     
+
+
+## manually create code_dictionary
+## no nationality defined for:
+## "United Nations Laissez-Passer", "Total", "No Nationality", "Serbia and Montenegro"
+code_dictionary <- c(
+  # nationality = code
+  "Cabo Verde" = "CPV",
+  "Congo, Dem. Rep. of the (Kinshasa)" = "COD",
+  "Congo, Rep. of the (Brazzaville)" = "COG",
+  "Cote d'Ivoire" = "CIV",
+  "Gambia, The" = "GMB",
+  "Libya" = "LBY",
+  "Eswatini" = "SWZ",
+  "Tanzania" = "TZA",
+  "Brunei" = "BRN",
+  "Burma" = "MMR",
+  "China - mainland" = "CHN",
+  "China - Taiwan" = "TWN",
+  "Hong Kong S.A.R." = "HKG",
+  "Korea, North" = "PRK",
+  "Korea, South" = "KOR",
+  "Laos" = "LAO",
+  "Palestinian Authority Travel Document" = "PSE",
+  "Syria" = "SYR",
+  "Great Britain and Northern Ireland" = "GBR",
+  "Macedonia" = "MKD",
+  "Moldova" = "MDA",
+  "Vatican City" = "VAT",
+  "Bahamas, The" = "BHS",
+  "Macau S.A.R." = "MAC",
+  "Kosovo" = "RKS",
+  "South Sudan" = "SSD"
+)
+for(nation in names(code_dictionary)) {
+  overall_df[ nationality == nation, Alpha.3.code := code_dictionary[nation] ]
 }
 
 ###### Updating visa categories ######

@@ -134,7 +134,9 @@ workload_server_evolution <- function(input, output, session) {
         layout(title = title,
                yaxis = list(title = y_title, tickformat = "%"),
                xaxis = list(title = "Year"),
-               hovermode = "compare")
+               hovermode = "compare",
+               paper_bgcolor="rgba(0,0,0,0)",
+               plot_bgcolor="rgba(0,0,0,0)")
       
       for(col in colnames(subsection)[-1]) {
         plot <- plot %>% add_trace(x = subsection[["year"]], y = subsection[[col]], 

@@ -142,7 +142,9 @@ issuances_server_overall <- function(input, output, session) {
       layout(title = sprintf("Overall Non-Immigrant Visa Issuances (%s-%s)", year_min, year_max),
              yaxis = list(title = "# Issuances"),
              xaxis = list(title = "Visa Category"),
-             hovermode = "compare")
+             hovermode = "compare",
+             paper_bgcolor="rgba(0,0,0,0)",
+             plot_bgcolor="rgba(0,0,0,0)")
   })
   
   output$issuances_overall_notes <- renderUI({
@@ -169,7 +171,9 @@ issuances_server_evolution <- function(input, output, session) {
                                    year_min, year_max, title_categories),
                    yaxis = list(title = "# Issuances"),
                    xaxis = list(title = "Year"),
-                   hovermode = "compare")
+                   hovermode = "compare",
+                   paper_bgcolor="rgba(0,0,0,0)",
+                   plot_bgcolor="rgba(0,0,0,0)")
     
     for(cat in categories) {
       plot <- plot %>% add_trace(x = wide_dt[["year"]], y = wide_dt[[cat]], 

@@ -138,6 +138,7 @@ regional$nationality <- factor(regional$nationality, get_nation_factor_levels(re
 region_levels <- c("Africa", "Asia", "Europe", "North America", "Oceania", 
                    "South America", "Unknown", "Total")
 regional$region <- factor(regional$region, region_levels)
+regional$Alpha.3.code <- factor(regional$Alpha.3.code)
 
 ###### Reorder and relabel datasets ######
 
@@ -148,7 +149,8 @@ workload <- workload[ , c("year", "visa_category", "issued", "refused", "workloa
                           "waived_overcome", "perc_issued", "perc_granted") ]
 workload <- workload[ order(year, visa_category) ]
 
-regional <- regional[ , c("year", "visa_category", "nationality", "region", 
+colnames(regional)[7] <- "country_code"
+regional <- regional[ , c("year", "visa_category", "nationality", "region", "country_code",
                           "issued", "is_total") ]
 regional <- regional[ order(year, visa_category, region, nationality) ]
 
