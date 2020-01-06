@@ -30,6 +30,7 @@ get_visa_select <- function(dt, select_id, selected=c("Total"), multiple = TRUE)
                         selected = selection,
                         options = list(`actions-box` = TRUE),
                         multiple = multiple)
+  return(select)
 }
 
 get_notes_html <- function(visa_categories = c(), additional_notes = c()) {

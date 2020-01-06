@@ -5,9 +5,6 @@ Did you know that the US Travel Department releases statistics on the [processin
 
 I'm making this app to satisfy my own desire to explore and tinker with this data in an interactive way.
 
-### To do
-* Run cleaning code 2 to make the relevant character vars factors
-
 ### R Shiny Graph Ideas
 
 * Summary

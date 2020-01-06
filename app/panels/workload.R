@@ -62,7 +62,8 @@ workload_ui_breakdown <- function() {
         p("Subset the data to see and download different tables."),
         get_year_slider(dt=workload, slider_id="workload_breakdown_year"),
         get_visa_select(dt=workload, select_id="workload_breakdown_categories"),
-        workload_get_stat_select(select_id="workload_breakdown_stats")
+        workload_get_stat_select(select_id="workload_breakdown_stats"),
+        downloadButton("workload_breakdown_download", "Download the Data")
       ),
       mainPanel(
         DT::dataTableOutput("workload_breakdown_table"),
@@ -156,6 +157,8 @@ workload_server_evolution <- function(input, output, session) {
 
 workload_server_breakdown <- function(input, output, session) {
   
+  dataset <- reactiveVal(0)
+  
   output$workload_breakdown_table <- DT::renderDataTable({
     ## parse input vars
     year_min <- input$workload_breakdown_year[1]
@@ -178,13 +181,26 @@ workload_server_breakdown <- function(input, output, session) {
     
     selected <- filtered[, c("Year", "Visa Category", stats)]
     
+    # set data
+    dataset(selected)
+    
     # show and format table
-    DT::datatable(selected, rownames=FALSE) %>% formatPercentage(-1:-2, digits = 2)
+    DT::datatable(dataset(), rownames=FALSE) %>% formatPercentage(-1:-2, digits = 2)
   })
   
   output$workload_breakdown_notes <- renderUI({
     workload_get_notes_html(input$workload_breakdown_stats, input$workload_breakdown_categories)
   })
+  
+  output$workload_breakdown_download <-  downloadHandler(
+    filename = function() {
+      sprintf("issuances_refusals_by_year_cat_%s-%s.csv", 
+              input$workload_breakdown_year[1], input$workload_breakdown_year[2])
+    },
+    content = function(file) {
+      write.csv(dataset(), file)
+    }
+  )
   
 }
 

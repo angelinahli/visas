@@ -193,11 +193,6 @@ issuances_server_breakdown <- function(input, output, session) {
   dataset <- reactiveVal(0)
   
   output$issuances_breakdown_table <- DT::renderDataTable({
-    ## parse input vars
-    year_min <- input$issuances_breakdown_year[1]
-    year_max <- input$issuances_breakdown_year[2]
-    categories <- input$issuances_breakdown_categories
-    
     # set dataset attribute
     df <- issuances_get_evolution_df(input$issuances_breakdown_year[1], 
                                      input$issuances_breakdown_year[2], 
@@ -212,7 +207,7 @@ issuances_server_breakdown <- function(input, output, session) {
   
   output$issuances_breakdown_download <- downloadHandler(
     filename = function() {
-      sprintf("issuances_by_year_cat_%s-%s.csv", 
+      sprintf("issuances_by_year_category_%s-%s.csv", 
               input$issuances_breakdown_year[1], input$issuances_breakdown_year[2])
     },
     content = function(file) {
