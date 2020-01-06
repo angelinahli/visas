@@ -9,25 +9,34 @@
 ###### UI ######
 
 workload_ui <- function() {
-  tabPanel(
-    
-    title = "Issuances and Refusals", 
-    value = "Issuances and Refusals",
-    
+  tabPanel("Issuances and Refusals",
     tabsetPanel(
-      
       type = "tabs",
-      
-      tabPanel("Evolution"),
-      tabPanel("Detailed Breakdown")
-      
+      workload_ui_evolution(),
+      workload_ui_breakdown()
     )
-    
   )
+}
+
+workload_ui_evolution <- function() {
+  tabPanel("Evolution")
+}
+
+workload_ui_breakdown <- function() {
+  tabPanel("Detailed Breakdown")
 }
 
 ###### Server ######
 
 workload_server <- function(input, output, session) {
+  workload_server_evolution(input, output, session)
+  workload_server_breakdown(input, output, session)
+}
+
+workload_server_evolution <- function(input, output, session) {
+  
+}
+
+workload_server_breakdown <- function(input, output, session) {
   
 }

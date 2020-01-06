@@ -111,6 +111,15 @@ sources <- data.table(
 
 labels <- left_join(labels, sources, by=c("Short.Description.Source"="URL") )
 
+###### Make relevant variables factors ######
+
+###### TODO: Come back to this!
+get_visa_factor_levels <- function(dt) {
+  levels <- sort(unique(labels$Visa.Category))
+  levels <- levels[levels %in% unique(dt$visa_category)]
+  levels <- c("Total", levels)
+  return(levels)
+}
 
 ###### Reorder and relabel datasets ######
 

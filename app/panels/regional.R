@@ -10,24 +10,34 @@
 
 regional_ui <- function() {
   tabPanel(
-    
-    title = "Issuances Per Country", 
-    value = "Issuances Per Country",
-    
+    "Issuances Per Country", 
     tabsetPanel(
-      
       type = "tabs",
-      
-      tabPanel("Evolution"),
-      tabPanel("Detailed Breakdown")
-      
+      regional_ui_evolution(),
+      regional_ui_breakdown()
     )
-    
   )
+}
+
+regional_ui_evolution <- function() {
+  tabPanel("Evolution")
+}
+
+regional_ui_breakdown <- function() {
+  tabPanel("Detailed Breakdown")
 }
 
 ###### Server ######
 
 regional_server <- function(input, output, session) {
+  regional_server_evolution(input, output, session)
+  regional_server_breakdown(input, output, session)
+}
+
+regional_server_evolution <- function(input, output, session) {
+  
+}
+
+regional_server_breakdown <- function(input, output, session) {
   
 }

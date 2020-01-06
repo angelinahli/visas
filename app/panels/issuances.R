@@ -21,11 +21,56 @@ issuances_ui <- function() {
 }
 
 issuances_ui_overall <- function() {
-  tabPanel("Overall")
+  tabPanel(
+    "Overall",
+    
+    h4("Overall Issuances by Visa Category"),
+    p("This tab explores some basic numbers on how many visas have been",
+      "issued across all years."),
+    br(),
+    
+    sidebarLayout(
+      sidebarPanel(
+        p("Subset the data to see different plots."),
+        get_year_slider(dt=regional, slider_id="issuances_overall_year"),
+        
+        sliderInput("issuances_overall_num_cats", 
+                    "Number of Categories to Show", 
+                    min=1, max=length(unique(regional$visa_category)), 
+                    value=10,
+                    step=1)
+      ),
+      mainPanel(
+        plotlyOutput("issuances_overall_plot")
+      )
+    )
+    
+  )
 }
 
 issuances_ui_evolution <- function() {
-  tabPanel("Evolution")
+  tabPanel(
+    "Evolution",
+    
+    h4("Visa Issuances Over Time"),
+    p("This tab explores some data on how visa issuances have changed",
+      "over time."),
+    br(),
+    
+    sidebarLayout(
+      sidebarPanel(
+        p("Subset the data to see different plots."),
+        get_year_slider(dt=regional, slider_id="issuances_evolution_year"),
+        get_visa_select(dt=regional, 
+                        select_id="issuances_evolution_categories",
+                        selected=c("Total")) # not sure if there's another way?
+      ),
+      mainPanel(
+        plotlyOutput("issuances_evolution_plot")
+      )
+    )
+    
+  )
 }
 
 issuances_ui_breakdown <- function() {
@@ -35,5 +80,79 @@ issuances_ui_breakdown <- function() {
 ###### Server ######
 
 issuances_server <- function(input, output, session) {
+  issuances_server_overall(input, output, session)
+  issuances_server_evolution(input, output, session)
+  issuances_server_breakdown(input, output, session)
+}
+
+issuances_server_overall <- function(input, output, session) {
+  
+  ## plot
+  output$issuances_overall_plot <- renderPlotly({
+    ## parse input vars
+    year_min <- input$issuances_overall_year[1]
+    year_max <- input$issuances_overall_year[2]
+    num_categories <- input$issuances_overall_num_cats
+    
+    grouped <- regional %>% 
+               dplyr::filter(year >= year_min & year <= year_max & region == "Total") %>%
+               select(visa_category, issued) %>%
+               group_by(visa_category) %>% 
+               summarise(issued = sum(issued)) %>%
+               arrange(desc(issued))
+    
+    top_rows <- head(grouped, num_categories + 1)
+    other_count_df <- grouped %>% 
+                      dplyr::filter(!(visa_category %in% unique(top_rows$visa_category))) %>%
+                      summarise(issued = sum(issued))
+    other_row <- list(visa_category="Other", issued=other_count_df$issued)
+    all_data <- rbind(top_rows, other_row)
+    
+    # order:
+    visa_order <- all_data$visa_category
+    all_data$visa_category <- factor(all_data$visa_category, visa_order)
+    
+    plot_ly(type = "bar", data = all_data, x = ~visa_category, y = ~issued) %>%
+      layout(title = sprintf("Overall Visa Issuances (%s-%s)", year_min, year_max),
+             yaxis = list(title = "# Issuances"),
+             xaxis = list(title = "Visa Category"))
+  })
+  
+}
+
+issuances_server_evolution <- function(input, output, session) {
+  
+  output$issuances_evolution_plot <- renderPlotly({
+    ## parse input vars
+    year_min <- input$issuances_evolution_year[1]
+    year_max <- input$issuances_evolution_year[2]
+    categories <- input$issuances_evolution_categories
+    
+    grouped <- regional %>% 
+               dplyr::filter(year >= year_min & year <= year_max & 
+                             region == "Total" & visa_category %in% categories) %>%
+               select(year, visa_category, issued) %>%
+               group_by(year, visa_category) %>% 
+               summarise(issued = sum(issued)) %>%
+               arrange(year, visa_category)
+    
+    wide_dt <- spread(grouped, visa_category, issued)
+    
+    plot <- plot_ly(type = "scatter", mode = "lines", 
+                    data = wide_dt, 
+                    x = ~year, y = wide_dt[categories[1]], name = categories[1]) %>%
+              layout(title = sprintf("Visa Issuances Over Time (%s-%s)", year_min, year_max),
+                     yaxis = list(title = "# Issuances"),
+                     xaxis = list(title = "Year"))
+    for(cat in categories[-1]) {
+      plot <- plot %>% add_trace(y = wide_dt[cat], name = cat, mode = "lines")
+    }
+    
+    plot    
+  })
+  
+}
+
+issuances_server_breakdown <- function(input, output, session) {
   
 }

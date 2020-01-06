@@ -9,10 +9,13 @@
 library(shiny)
 library(shinyBS)
 library(shinythemes)
+library(shinyWidgets)
+library(plotly)
 library(ggplot2)
 library(data.table)
 library(DT)
 library(dplyr)
+library(tidyr)
 library(emo)
 
 ###### Defining Paths and Importing Data ######
@@ -24,8 +27,9 @@ labels <- data.table(readRDS(file.path(data_path, "labels.rds")))
 regional <- data.table(readRDS(file.path(data_path, "regional.rds")))
 workload <- data.table(readRDS(file.path(data_path, "workload.rds")))
 
-###### Sourcing Panel Helper Functions ######
+###### Sourcing Helper Functions ######
 
+source(file.path("helpers.R"), local=TRUE)$value
 source(file.path("panels", "home.R"), local=TRUE)$value
 source(file.path("panels", "summary.R"), local=TRUE)$value
 source(file.path("panels", "issuances.R"), local=TRUE)$value
