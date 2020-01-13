@@ -30,11 +30,8 @@ workload <- data.table(readRDS(file.path(data_path, "workload.rds")))
 ###### Sourcing Helper Functions ######
 
 source(file.path("helpers.R"), local=TRUE)$value
-source(file.path("panels", "home.R"), local=TRUE)$value
-source(file.path("panels", "summary.R"), local=TRUE)$value
-source(file.path("panels", "issuances.R"), local=TRUE)$value
-source(file.path("panels", "workload.R"), local=TRUE)$value
-source(file.path("panels", "regional.R"), local=TRUE)$value
+source(file.path("panels", "analysis.R"), local=TRUE)$value
+source(file.path("panels", "info.R"), local=TRUE)$value
 
 ###### Defining UI ######
 
@@ -55,13 +52,10 @@ ui <- fluidPage(
            ## tabs
            div(
              tabsetPanel(
-               type="pills",
+               type="tabs",
                
-               home_ui(),
-               summary_ui(),
-               issuances_ui(),
-               workload_ui(),
-               regional_ui()
+               analysis_ui(),
+               info_ui()
                
              )
            )
@@ -75,11 +69,8 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  home_server(input, output, session)
-  summary_server(input, output, session)
-  issuances_server(input, output, session)
-  workload_server(input, output, session)
-  regional_server(input, output, session)
+  analysis_server(input, output, session)
+  info_server(input, output, session)
   
 }
 

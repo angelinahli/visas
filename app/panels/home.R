@@ -62,33 +62,6 @@ home_ui <- function() {
   )
 }
 
-get_accordion_card <- function(number, data_parent, question_text, answer_text) {
-  question_id <- paste0("home_q", number)
-  answer_id <- paste0("home_a", number)
-  template <- "
-    <div class='card'>
-      <div class='card-header' id='%s'>
-        <h2 class='mb-0'>
-          <button class='btn btn-link' type='button' data-toggle='collapse' 
-           data-target='#%s' aria-expanded='true' aria-controls='%s'>
-            %s
-           </button>
-        </h2>
-      </div>
-             
-      <div id='%s' class='collapse show' aria-labelledby='%s' data-parent='#%s'>
-        <div class='card-body'>
-          %s
-        </div>
-      </div>
-    </div>
-  "
-  rendered <- sprintf(template, 
-                      question_id, answer_id, answer_id, question_text, answer_id, 
-                      question_id, data_parent, answer_text)
-  return(rendered)
-}
-
 ###### Server ######
 
 home_server <- function(input, output, session) {
