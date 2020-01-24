@@ -36,17 +36,21 @@ source(file.path("panels", "info.R"), local=TRUE)$value
 ###### Defining UI ######
 
 ui <- fluidPage(
-  theme = shinytheme("simplex"),
+
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
+    tags$link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Open+Sans:400,700|Merriweather&display=swap")
+  ),
   
   fluidRow(
     column(1),
     column(10,
            
            ## heading
-           h2(emo::ji("red_heart"), "US Non-Immigrant Visa Data Explorer", emo::ji("blue_heart")),
-           p("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " in Jan 2020", 
-             emo::ji("diamond_shape_with_a_dot_inside"),
-             a(href="https://github.com/angelinahli/visas/", "Source code")),
+           h2(strong("US Non-Immigrant Visa Explorer"), class="text-title"),
+           p("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " in Jan 2020 - ", 
+             a(href="https://github.com/angelinahli/visas/", "Source code"),
+             class="lead text-grey"),
            hr(),
            
            ## tabs
@@ -60,7 +64,8 @@ ui <- fluidPage(
              )
            )
            
-    )
+    ),
+    class="text-black"
   )
     
 )

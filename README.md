@@ -5,6 +5,11 @@ Did you know that the US Travel Department releases statistics on the [processin
 
 I'm making this app to satisfy my own desire to explore and tinker with this data in an interactive way.
 
+### Alpha version notes and to dos
+
+* Overarching:
+    * Make the app overall easier to use
+
 ### R Shiny Graph Ideas
 
 * Summary
