@@ -69,7 +69,7 @@ ui <- fluidPage(
   tags$footer(
     div("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " in Jan 2020 - ", 
       "Icons by ",
-      a(href="https://www.flaticon.com/authors/freepik", title="Freepik", "Smashicons"),
+      a(href="https://www.flaticon.com/authors/freepik", title="Freepik", "Freepik"),
       " - ",
       a(href="https://github.com/angelinahli/visas/", "Source code"),
       class="text-grey", style="font-size: 15px"))

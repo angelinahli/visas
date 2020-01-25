@@ -18,13 +18,30 @@ get_year_slider <- function(dt, slider_id, multiple=TRUE) {
   return(slider)
 }
 
+get_visa_select <- function(dt, select_id, multiple=TRUE) {
+  choices <- as.character(unique(dt$visa_category))
+  choices <- c("Total", sort(choices[ choices != "Total" ]))
+  label <- ifelse(multiple, "Visa Categories", "Visa Category")
+  select <- selectInput(select_id, label,
+                        choices = choices,
+                        selected = c("Total"),
+                        multiple = multiple)
+  return(select)
+}
+
+get_categories_text <- function(cats) {
+  if(length(cats) == 1) { return(cats[1]) }
+  joined_until_last <- paste(cats[1:length(cats)-1], collapse=", ")
+  return( paste(joined_until_last, "and", cats[length(cats)]) )
+}
+
 get_spacer <- function() {
   div(style="margin: 10px")
 }
 
 get_plotly_layout <- function(plot, plotly_layout) {
   # defines some default attribuets of plotly layout to allow for better standardization
-  bg_color <- "rgba(250, 250, 250, 1)"
+  bg_color <- "rgba(255, 255, 255, 1)"
   l <- list(
     p = plot,
     plot_bgcolor = bg_color,
