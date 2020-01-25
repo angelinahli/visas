@@ -246,13 +246,13 @@ analysis_server_map <- function(input, output, session) {
     plot_geo(subsection) %>%
       add_trace(
         z = ~issued, color = ~issued,
-        text = ~nationality, locations = ~country_code, colors = "Blues",
-        marker = list(line = list(color = toRGB("grey"), width = 0.5)) ) %>%
+        text = ~nationality, locations = ~country_code,
+        colorscale = "Portland") %>%
       colorbar(title = "# Issuances") %>%
       get_plotly_layout(list(
         title = list(text = sprintf("%s Visa Issuances in %s", category, selected_year)),
-        geo = list(showframe = F, showcoastlines = F, projection = list(type = "winkel tripel")),
-        margin = list(l = 50, r = 50, b = 0, t = 100, pad = 4)
+        geo = list(projection = list(type = "winkel tripel")),
+        margin = list(l = 20, r = 20, b = 0, t = 50, pad = 2)
       ))
   })
   output$analysis_map_notes <- renderUI({
@@ -263,20 +263,22 @@ analysis_server_map <- function(input, output, session) {
 analysis_server_gif <- function(input, output, session) {
   output$analysis_gif_plot <- renderPlotly({
     category <- input$analysis_gif_visas
-    
     subsection <- regional %>% 
       filter(visa_category == category & !is.na(country_code))
+    limits <- c(min(subsection$issued, na.rm=T), max(subsection$issued, na.rm=T)) 
     
     plot_geo(subsection) %>%
       add_trace(
         z = ~issued, color = ~issued, frame = ~year,
-        text = ~nationality, locations = ~country_code, colors = "Blues",
-        marker = list(line = list(color = toRGB("grey"), width = 0.5)) ) %>%
-      colorbar(title = "# Issuances") %>%
+        text = ~nationality, locations = ~country_code,
+        colorscale = "Portland") %>%
+      colorbar(limits = limits) %>%
+      # animation_opts(20000, easing = "elastic") %>%
+      animation_slider(currentvalue = list(prefix = "Year ", font = list(color = "grey")) ) %>%
       get_plotly_layout(list(
         title = list(text = paste0(category, " Visa Issuances")),
-        geo = list(showframe = F, showcoastlines = F, projection = list(type = "winkel tripel")),
-        margin = list(l = 50, r = 50, b = 0, t = 100, pad = 4)
+        geo = list(projection = list(type = "winkel tripel")),
+        margin = list(l = 0, r = 0, b = 0, t = 30, pad = 2)
       ))
   })
   output$analysis_gif_notes <- renderUI({
