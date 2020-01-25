@@ -40,7 +40,8 @@ analysis_ui_issuances <- function() {
         get_year_slider(dt=regional, slider_id="analysis_issuances_year")
       ),
       mainPanel(
-        plotlyOutput("analysis_issuances_plot")
+        plotlyOutput("analysis_issuances_plot"),
+        uiOutput("analysis_issuances_notes")
       )
     )
     
@@ -65,7 +66,8 @@ analysis_ui_workload <- function() {
                     multiple = TRUE)
       ),
       mainPanel(
-        plotlyOutput("analysis_workload_plot")
+        plotlyOutput("analysis_workload_plot"),
+        uiOutput("analysis_workload_notes")
       )
     )
   )
@@ -80,10 +82,11 @@ analysis_ui_map <- function() {
       sidebarPanel(
         p("Subset the data to see different maps."),
         get_visa_select(dt=regional, select_id="analysis_map_visas", multiple=F),
-        get_year_slider(dt=regional, slider_id="analysis_map_year", multiple=F),
+        get_year_slider(dt=regional, slider_id="analysis_map_year", multiple=F)
       ),
       mainPanel(
-        plotlyOutput("analysis_map_plot")
+        plotlyOutput("analysis_map_plot"),
+        uiOutput("analysis_map_notes")
       )
     )
   )
@@ -95,10 +98,12 @@ analysis_ui_map_gif <- function() {
     get_spacer(),
     sidebarLayout(
       sidebarPanel(
-        p("Testing")
+        p("Testing"),
+        get_visa_select(dt=regional, select_id="analysis_gif_visas", multiple=F)
       ),
       mainPanel(
-        plotlyOutput("analysis_map_gif_plot")
+        plotlyOutput("analysis_gif_plot"),
+        uiOutput("analysis_gif_notes")
       )
     )
     
@@ -113,16 +118,17 @@ analysis_ui_regional <- function() {
     sidebarLayout(
       sidebarPanel(
         p("Subset the data to see different plots."),
+        get_visa_select(dt=regional, select_id="analysis_regional_visas", multiple=F),
         get_year_slider(dt=regional, slider_id="analysis_regional_year"),
-        pickerInput("analysis_regional_nationality", 
+        selectInput("analysis_regional_nationality", 
                     label = "Nationalities",
                     choices = as.character(sort(unique(regional$nationality))),
                     selected = as.character(sort(regional[ is_total == TRUE, unique(nationality)])),
-                    options = list(`actions-box` = TRUE),
-                    multiple = TRUE)
+                    multiple = TRUE),
       ),
       mainPanel(
-        plotlyOutput("analysis_regional_plot")
+        plotlyOutput("analysis_regional_plot"),
+        uiOutput("analysis_regional_notes")
       )
     )
   )
@@ -156,7 +162,7 @@ analysis_server_issuances <- function(input, output, session) {
     
     plot <- plot_ly() %>%
       get_plotly_layout(list(
-        title = list(text = sprintf("Number of %s Visas Issued Over Time<br>%s-%s", 
+        title = list(text = sprintf("Number of %s Visas Issued<br>%s-%s", 
                             get_categories_text(categories), year_min, year_max)),
         yaxis = list(title = "# Issuances"),
         xaxis = list(title = "Year"),
@@ -168,6 +174,9 @@ analysis_server_issuances <- function(input, output, session) {
     }
     
     plot    
+  })
+  output$analysis_issuances_notes <- renderUI({
+    get_notes_html(input$analysis_issuances_visas)
   })
 }
 
@@ -199,7 +208,7 @@ analysis_server_workload <- function(input, output, session) {
       stats_text <- ifelse(length(stats) == 0, 
                            "Issued", 
                            paste0(str_replace_all(stats, "% ", ""), collapse = " and "))
-      title <- sprintf("Percentage of %s Visa Applications %s Over Time<br>%s-%s<br>",
+      title <- sprintf("Percentage of %s Applications %s<br>%s-%s<br>",
                        get_categories_text(categories),
                        stats_text,
                        year_min, year_max)
@@ -220,6 +229,9 @@ analysis_server_workload <- function(input, output, session) {
       
       plot
     }
+  })
+  output$analysis_workload_notes <- renderUI({
+    get_notes_html(input$analysis_workload_visas)
   })
 }
 
@@ -243,6 +255,9 @@ analysis_server_map <- function(input, output, session) {
         margin = list(l = 50, r = 50, b = 0, t = 100, pad = 4)
       ))
   })
+  output$analysis_map_notes <- renderUI({
+    get_notes_html(input$analysis_map_visas)
+  })
 }
 
 analysis_server_map_gif <- function(input, output, session) {
@@ -250,5 +265,42 @@ analysis_server_map_gif <- function(input, output, session) {
 }
 
 analysis_server_regional <- function(input, output, session) {
-  
+  output$analysis_regional_plot <- renderPlotly({
+    year_min <- input$analysis_regional_year[1]
+    year_max <- input$analysis_regional_year[2]
+    nationalities <- input$analysis_regional_nationality
+    category <- input$analysis_regional_visas
+    
+    dt <- regional %>% 
+      filter(year >= year_min & year <= year_max & 
+               nationality %in% nationalities & visa_category == category) %>%
+      select(year, nationality, issued) %>%
+      group_by(year, nationality) %>% 
+      summarise(issued = sum(issued)) %>%
+      arrange(year, nationality) %>%
+      spread(nationality, issued)
+    
+    nat_title <- "Selected Nationalities"
+    if(length(nationalities) == 1) {
+      if(nationalities[1] == "Total") { nat_title <- "All Nationalities" }
+      else { nat_title <- paste0("Applicants from ", gsub(" - Total", "", nationalities[1])) }
+    }
+    plot <- plot_ly() %>%
+      get_plotly_layout(list(
+        title = list(text = sprintf("%s Visa Issuances for %s<br>%s-%s", 
+                                    category, nat_title, year_min, year_max)),
+        yaxis = list(title = "# Issuances"),
+        xaxis = list(title = "Year"),
+        hovermode = "compare"))
+    
+    for(nat in nationalities) {
+      plot <- plot %>% add_trace(x = dt[["year"]], y = dt[[nat]], 
+                                 name = nat, type = "scatter", mode = "lines")
+    }
+    
+    plot
+  })
+  output$analysis_regional_notes <- renderUI({
+    get_notes_html(input$analysis_regional_visas)
+  })
 }
