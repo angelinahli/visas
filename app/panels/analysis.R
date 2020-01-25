@@ -21,7 +21,7 @@ analysis_ui <- function() {
       analysis_ui_issuances(),
       analysis_ui_workload(),
       analysis_ui_map(),
-      analysis_ui_map_gif(),
+      analysis_ui_gif(),
       analysis_ui_regional()
     )
     
@@ -92,7 +92,7 @@ analysis_ui_map <- function() {
   )
 }
 
-analysis_ui_map_gif <- function() {
+analysis_ui_gif <- function() {
   screen(
     h4("Visas Issued By Country and Year (Animated)"),
     get_spacer(),
@@ -140,7 +140,7 @@ analysis_server <- function(input, output, session) {
   analysis_server_issuances(input, output, session)
   analysis_server_workload(input, output, session)
   analysis_server_map(input, output, session)
-  analysis_server_map_gif(input, output, session)
+  analysis_server_gif(input, output, session)
   analysis_server_regional(input, output, session)
 }
 
@@ -260,8 +260,28 @@ analysis_server_map <- function(input, output, session) {
   })
 }
 
-analysis_server_map_gif <- function(input, output, session) {
-  
+analysis_server_gif <- function(input, output, session) {
+  output$analysis_gif_plot <- renderPlotly({
+    category <- input$analysis_gif_visas
+    
+    subsection <- regional %>% 
+      filter(visa_category == category & !is.na(country_code))
+    
+    plot_geo(subsection) %>%
+      add_trace(
+        z = ~issued, color = ~issued, frame = ~year,
+        text = ~nationality, locations = ~country_code, colors = "Blues",
+        marker = list(line = list(color = toRGB("grey"), width = 0.5)) ) %>%
+      colorbar(title = "# Issuances") %>%
+      get_plotly_layout(list(
+        title = list(text = paste0(category, " Visa Issuances")),
+        geo = list(showframe = F, showcoastlines = F, projection = list(type = "winkel tripel")),
+        margin = list(l = 50, r = 50, b = 0, t = 100, pad = 4)
+      ))
+  })
+  output$analysis_gif_notes <- renderUI({
+    get_notes_html(input$analysis_gif_visas)
+  })
 }
 
 analysis_server_regional <- function(input, output, session) {
