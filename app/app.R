@@ -10,6 +10,7 @@ library(shiny)
 library(shinyBS)
 library(shinythemes)
 library(shinyWidgets)
+library(shinyglide)
 library(plotly)
 library(data.table)
 library(DT)
@@ -31,7 +32,9 @@ workload <- data.table(readRDS(file.path(data_path, "workload.rds")))
 
 source(file.path("helpers.R"), local=TRUE)$value
 source(file.path("panels", "analysis.R"), local=TRUE)$value
-source(file.path("panels", "info.R"), local=TRUE)$value
+source(file.path("panels", "faqs.R"), local=TRUE)$value
+source(file.path("panels", "visas.R"), local=TRUE)$value
+source(file.path("panels", "downloads.R"), local=TRUE)$value
 
 ###### Defining UI ######
 
@@ -39,35 +42,37 @@ ui <- fluidPage(
 
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
-    tags$link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Open+Sans:400,700|Merriweather&display=swap")
+    tags$link(rel = "stylsheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Montserrat|Open+Sans&display=swap"),
+    tags$link(rel = "icon", type = "image/png", sizes = "16x16", href = "img/favicon-16.png"),
+    tags$link(rel = "icon", type = "image/png", sizes = "32x32", href = "img/favicon-32.png"),
+    tags$link(rel = "icon", type = "image/png", sizes = "96x96", href = "img/favicon-96.png")
   ),
   
-  fluidRow(
-    column(1),
-    column(10,
-           
-           ## heading
-           h2(strong("US Non-Immigrant Visa Explorer"), class="text-title"),
-           p("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " in Jan 2020 - ", 
-             a(href="https://github.com/angelinahli/visas/", "Source code"),
-             class="lead text-grey"),
-           hr(),
-           
-           ## tabs
-           div(
-             tabsetPanel(
-               type="tabs",
-               
-               analysis_ui(),
-               info_ui()
-               
-             )
-           )
-           
+  div(
+    ## heading
+    h1(img(src="img/statue-of-liberty.svg", style="height: 60px"),
+       strong("US Non-Immigrant Visa Explorer"), 
+       class="text-title"),
+    get_spacer(),
+   
+    ## tabs
+    tabsetPanel(
+      type="pills",
+      analysis_ui(),
+      faqs_ui(),
+      visas_ui(),
+      downloads_ui()
     ),
-    class="text-black"
-  )
-    
+    class="text-black container"
+  ),
+  
+  tags$footer(
+    div("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " in Jan 2020 - ", 
+      "Icons by ",
+      a(href="https://www.flaticon.com/authors/freepik", title="Freepik", "Smashicons"),
+      " - ",
+      a(href="https://github.com/angelinahli/visas/", "Source code"),
+      class="text-grey", style="font-size: 15px"))
 )
 
 ###### Defining Server ######
@@ -75,8 +80,10 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   
   analysis_server(input, output, session)
-  info_server(input, output, session)
-  
+  faqs_server(input, output, session)
+  visas_server(input, output, session)
+  downloads_server(input, output, session)
+
 }
 
 ###### Run the app ######

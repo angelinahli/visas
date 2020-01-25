@@ -18,42 +18,24 @@ get_year_slider <- function(dt, slider_id, multiple=TRUE) {
   return(slider)
 }
 
-get_visa_select <- function(dt, select_id, selected=c("Total"), multiple = TRUE) {
-  # return a select component with id select_id, with options sourced
-  # from dt$visa_category
-  # assume visa_category is a factor
-  choices <- as.character(sort(unique(dt$visa_category)))
-  selection <- choices
-  if(!is.na(selected)) { selection <- selected }
-  select <- pickerInput(select_id, label = "Visa Categories",
-                        choices = choices,
-                        selected = selection,
-                        options = list(`actions-box` = TRUE),
-                        multiple = multiple)
-  return(select)
+get_spacer <- function() {
+  div(style="margin: 10px")
 }
 
-get_notes_html <- function(visa_categories = c(), additional_notes = c()) {
-  # prints out standard notes on visa categories, as well as any additional
-  # notes
-  labels_subset <- labels[visa_category %in% visa_categories, ]
-  # if there are any notes to print
-  if(nrow(labels_subset) > 0 | length(additional_notes) > 0) {
-    
-    notes <- c()
-    for(note in additional_notes) {
-      new_bullet <- sprintf("<li>%s</li>", note)
-      notes <- c(notes, new_bullet)
-    }
-    for(cat in unique(labels_subset$visa_category)) {
-      label <- labels_subset[ visa_category == cat, description ]
-      new_bullet <- sprintf("<li>The symbol '%s' refers to: %s</li>", cat, label)
-      notes <- c(notes, new_bullet)
-    }
-    
-    header <- ifelse(length(notes) > 1, "<h4>Notes</h4>", "<h4>Note</h4>")
-    all_text <- c(header, "<ul>", notes, "</ul>")
-    
-    HTML(paste(all_text, collapse = ""))
+get_plotly_layout <- function(plot, plotly_layout) {
+  # defines some default attribuets of plotly layout to allow for better standardization
+  bg_color <- "rgba(250, 250, 250, 1)"
+  l <- list(
+    p = plot,
+    plot_bgcolor = bg_color,
+    paper_bgcolor = bg_color,
+    font = list(family = '"Montserrat", "Open Sans", verdana, arial, sans-serif')
+  )
+  for(var in names(plotly_layout)) {
+    l[[var]] <- plotly_layout[[var]]
   }
+  if("title" %in% names(l)) {
+    l[["title"]][["font"]] <- list(size = 14)
+  }
+  return(do.call(plotly::layout, l))
 }
