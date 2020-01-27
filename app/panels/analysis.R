@@ -21,7 +21,6 @@ analysis_ui <- function() {
       analysis_ui_issuances(),
       analysis_ui_workload(),
       analysis_ui_map(),
-      analysis_ui_gif(),
       analysis_ui_regional()
     )
     
@@ -63,7 +62,14 @@ analysis_ui_workload <- function() {
                     choices = c(WORKLOAD_ISSUED_OPTION, WORKLOAD_GRANTED_OPTION),
                     selected = c(WORKLOAD_ISSUED_OPTION, WORKLOAD_GRANTED_OPTION),
                     options = list(`actions-box` = TRUE),
-                    multiple = TRUE)
+                    multiple = TRUE),
+        p(
+          "The % of applications issued is the number of applications issued",
+          "over the total number of applications processed.",
+          br(), br(),
+          "The % of applications granted is the number of applications issued",
+          "waived or overcome over the total number of applications processed.",
+        )
       ),
       mainPanel(
         plotlyOutput("analysis_workload_plot"),
@@ -75,7 +81,7 @@ analysis_ui_workload <- function() {
 
 analysis_ui_map <- function() {
   screen(
-    h4("Visas Issued By Country and Year (Interactive)"),
+    h4("Visas Issued By Country and Year"),
     get_spacer(),
     
     sidebarLayout(
@@ -89,24 +95,6 @@ analysis_ui_map <- function() {
         uiOutput("analysis_map_notes")
       )
     )
-  )
-}
-
-analysis_ui_gif <- function() {
-  screen(
-    h4("Visas Issued By Country and Year (Animated)"),
-    get_spacer(),
-    sidebarLayout(
-      sidebarPanel(
-        p("Testing"),
-        get_visa_select(dt=regional, select_id="analysis_gif_visas", multiple=F)
-      ),
-      mainPanel(
-        plotlyOutput("analysis_gif_plot"),
-        uiOutput("analysis_gif_notes")
-      )
-    )
-    
   )
 }
 
@@ -140,7 +128,6 @@ analysis_server <- function(input, output, session) {
   analysis_server_issuances(input, output, session)
   analysis_server_workload(input, output, session)
   analysis_server_map(input, output, session)
-  analysis_server_gif(input, output, session)
   analysis_server_regional(input, output, session)
 }
 
@@ -231,7 +218,14 @@ analysis_server_workload <- function(input, output, session) {
     }
   })
   output$analysis_workload_notes <- renderUI({
-    get_notes_html(input$analysis_workload_visas)
+    get_notes_html(
+      input$analysis_workload_visas, 
+      additional_notes = c(
+        paste0("Note that applications may be waived or ",
+               "overcome in a different fiscal year from when they were first ",
+               "processed. Thus, the percentage of applications granted may exceed ",
+               "100% in a given year, and is meant as an estimation only."))
+      )
   })
 }
 
@@ -257,32 +251,6 @@ analysis_server_map <- function(input, output, session) {
   })
   output$analysis_map_notes <- renderUI({
     get_notes_html(input$analysis_map_visas)
-  })
-}
-
-analysis_server_gif <- function(input, output, session) {
-  output$analysis_gif_plot <- renderPlotly({
-    category <- input$analysis_gif_visas
-    subsection <- regional %>% 
-      filter(visa_category == category & !is.na(country_code))
-    limits <- c(min(subsection$issued, na.rm=T), max(subsection$issued, na.rm=T)) 
-    
-    plot_geo(subsection) %>%
-      add_trace(
-        z = ~issued, color = ~issued, frame = ~year,
-        text = ~nationality, locations = ~country_code,
-        colorscale = "Portland") %>%
-      colorbar(limits = limits) %>%
-      # animation_opts(20000, easing = "elastic") %>%
-      animation_slider(currentvalue = list(prefix = "Year ", font = list(color = "grey")) ) %>%
-      get_plotly_layout(list(
-        title = list(text = paste0(category, " Visa Issuances")),
-        geo = list(projection = list(type = "winkel tripel")),
-        margin = list(l = 0, r = 0, b = 0, t = 30, pad = 2)
-      ))
-  })
-  output$analysis_gif_notes <- renderUI({
-    get_notes_html(input$analysis_gif_visas)
   })
 }
 

@@ -4,6 +4,8 @@
 ## R version:   3.3.3
 ## Description: Helper functions
 
+PLOT_HEIGHT = 500
+
 get_year_slider <- function(dt, slider_id, multiple=TRUE) {
   # returns a slider component with id slider_id, min=min(dt$year),
   # max=max(dt$year), value=c(min(dt$year), max(dt$year)), label 'Year'
@@ -40,7 +42,7 @@ get_joined_elts <- function(sorted_elts) {
   return( paste(joined_until_last, "and", sorted_elts[length(sorted_elts)]) )
 }
 
-get_notes_html <- function(visa_categories) {
+get_notes_html <- function(visa_categories, additional_notes = c()) {
   # prints out standard notes on visa categories, as well as any additional
   # notes
   cats <- get_sorted_categories(visa_categories)
@@ -51,6 +53,9 @@ get_notes_html <- function(visa_categories) {
                     "This category encompasses all non-immigrant visa categories per year",
                     labels_subset[ visa_category == cat, description ])
     notes <- c(notes, sprintf("<li>%s: %s</li>", cat, label))
+  }
+  for(n in additional_notes) {
+    notes <- c(notes, sprintf("<li>%s</li>", n))
   }
   
   header <- ifelse(length(notes) > 1, "<h5><b>Notes</b></h5>", "<h5><b>Note</b></h5>")
@@ -77,6 +82,8 @@ get_plotly_layout <- function(plot, plotly_layout) {
     p = plot,
     plot_bgcolor = bg_color,
     paper_bgcolor = bg_color,
+    colorway = c("#a0e3b7", "#851657", "#3ec349", "#d54db9", "#68c3ef", 
+                 "#2f4285", "#f1b3e3", "#115e41", "#c0e15c", "#4749dc"),
     font = list(family = '"Montserrat", "Open Sans", verdana, arial, sans-serif')
   )
   for(var in names(plotly_layout)) {
