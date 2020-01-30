@@ -48,20 +48,28 @@ get_notes_html <- function(visa_categories, additional_notes = c()) {
   cats <- get_sorted_categories(visa_categories)
   labels_subset <- labels[visa_category %in% cats, ]
   notes <- c()
+  addit_notes <- c(
+    "Total" = "This category encompasses all non-immigrant visa categories",
+    "Other" = "This category encompasses all other non-immigrant visa categories")
   for(cat in cats) {
-    label <- ifelse(cat == "Total",
-                    "This category encompasses all non-immigrant visa categories per year",
-                    labels_subset[ visa_category == cat, description ])
-    notes <- c(notes, sprintf("<li>%s: %s</li>", cat, label))
+    if(!(cat %in% c("Total", "Other"))) {
+      label <- labels_subset[ visa_category == cat, description ]
+      notes <- c(notes, sprintf("<li>%s: %s</li>", cat, label))
+    }
   }
   for(n in additional_notes) {
     notes <- c(notes, sprintf("<li>%s</li>", n))
   }
   
-  header <- ifelse(length(notes) > 1, "<h5><b>Notes</b></h5>", "<h5><b>Note</b></h5>")
-  all_text <- sprintf("<h5><b>Visa Descriptions</b></h5> <ul>%s</ul>", paste(notes, collapse = ""))
-
-  HTML(all_text)
+  if(length(notes) > 0) {
+    all_text <- sprintf(
+      "<div class='fixed-scroll'>
+         <h5><b>Visa Descriptions</b></h5>
+         <ul>%s</ul>
+       </div>", paste(notes, collapse = ""))
+    
+    HTML(all_text)
+  }
 }
 
 get_sorted_categories <- function(cats) {

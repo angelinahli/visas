@@ -18,12 +18,38 @@ analysis_ui <- function() {
     
     # description
     glide(
+      analysis_ui_start(),
       analysis_ui_issuances(),
       analysis_ui_workload(),
       analysis_ui_map(),
       analysis_ui_regional()
     )
     
+  )
+}
+
+analysis_ui_start <- function() {
+  screen(
+    h4("Welcome!"),
+    get_spacer(),
+    
+    sidebarLayout(
+      sidebarPanel(
+        p("This project explores data on non-immigrant visas in America.",
+          "Subset the data below to see different plots, and click next to continue."),
+        get_year_slider(dt=regional, slider_id="analysis_start_year"),
+        
+        sliderInput("analysis_start_num_cats", 
+                    "Number of Categories to Show", 
+                    min=1, max=length(unique(regional$visa_category)), 
+                    value=5,
+                    step=1)
+      ),
+      mainPanel(
+        plotlyOutput("analysis_start_plot"),
+        uiOutput("analysis_start_notes")
+      )
+    )
   )
 }
 
@@ -125,10 +151,58 @@ analysis_ui_regional <- function() {
 ###### Server ######
 
 analysis_server <- function(input, output, session) {
+  analysis_server_start(input, output, session)
   analysis_server_issuances(input, output, session)
   analysis_server_workload(input, output, session)
   analysis_server_map(input, output, session)
   analysis_server_regional(input, output, session)
+}
+
+analysis_server_start <- function(input, output, session) {
+  categories <- reactiveVal(c())
+  
+  ## plot
+  output$analysis_start_plot <- renderPlotly({
+    ## parse input vars
+    year_min <- input$analysis_start_year[1]
+    year_max <- input$analysis_start_year[2]
+    num_categories <- input$analysis_start_num_cats
+
+    grouped <- regional %>%
+      dplyr::filter(year >= year_min & year <= year_max & region == "Total") %>%
+      select(visa_category, issued) %>%
+      group_by(visa_category) %>%
+      summarise(issued = sum(issued)) %>%
+      arrange(desc(issued))
+
+    top_rows <- head(grouped, num_categories + 1)
+    top_rows$visa_category <- as.character(top_rows$visa_category)
+    other_count_df <- grouped %>%
+      filter(!(visa_category %in% unique(top_rows$visa_category))) %>%
+      summarise(issued = sum(issued))
+    other_row <- list(visa_category="Other", issued=other_count_df$issued)
+    all_data <- rbind(top_rows, other_row)
+
+    # order:
+    all_data$visa_category <- factor(all_data$visa_category, all_data$visa_category)
+
+    # save visa categories
+    categories(as.character(all_data$visa_category))
+
+    plot_ly(type = "bar", data = all_data,
+            x = ~visa_category, y = ~issued, color = ~visa_category) %>%
+    get_plotly_layout(list(
+      title = list(text = sprintf(
+        "Overall Number of Visas Issued<br>%s-%s", year_min, year_max)),
+      yaxis = list(title = "# Issuances"),
+      xaxis = list(title = "Visa Category"),
+      hovermode = "compare"))
+  })
+  
+  output$analysis_start_notes <- renderUI({
+    get_notes_html(visa_categories = categories())
+  })
+  
 }
 
 analysis_server_issuances <- function(input, output, session) {
@@ -137,30 +211,30 @@ analysis_server_issuances <- function(input, output, session) {
     year_min <- input$analysis_issuances_year[1]
     year_max <- input$analysis_issuances_year[2]
     categories <- input$analysis_issuances_visas
-    
-    wide_dt <- regional %>% 
-      filter(year >= year_min & year <= year_max & 
+
+    wide_dt <- regional %>%
+      filter(year >= year_min & year <= year_max &
                region == "Total" & visa_category %in% categories) %>%
       select(year, visa_category, issued) %>%
-      group_by(year, visa_category) %>% 
+      group_by(year, visa_category) %>%
       summarise(issued = sum(issued)) %>%
       arrange(year, visa_category) %>%
       spread(visa_category, issued)
-    
+
     plot <- plot_ly() %>%
       get_plotly_layout(list(
-        title = list(text = sprintf("Number of %s Visas Issued<br>%s-%s", 
+        title = list(text = sprintf("Number of %s Visas Issued<br>%s-%s",
                             get_categories_text(categories), year_min, year_max)),
         yaxis = list(title = "# Issuances"),
         xaxis = list(title = "Year"),
         hovermode = "compare"))
-    
+
     for(cat in categories) {
-      plot <- plot %>% add_trace(x = wide_dt[["year"]], y = wide_dt[[cat]], 
+      plot <- plot %>% add_trace(x = wide_dt[["year"]], y = wide_dt[[cat]],
                                  name = cat, type = "scatter", mode = "lines")
     }
-    
-    plot    
+
+    plot
   })
   output$analysis_issuances_notes <- renderUI({
     get_notes_html(input$analysis_issuances_visas)
