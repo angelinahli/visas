@@ -14,12 +14,12 @@ html {
 body {
   background-color: var(--light-bg-color);
   font-family: 'Open Sans', Arial, sans-serif;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 footer {
   position: fixed;
-  height: 40px;
+  height: 30px;
   bottom: 0;
   width: 100%;
   text-align: center;
@@ -56,10 +56,6 @@ a:hover,
 .btn-primary:hover {
   background-color: var(--light-color);
   border-color: var(--light-color);
-}
-
-.tab-content {
-  margin: 20px;
 }
 
 hr {

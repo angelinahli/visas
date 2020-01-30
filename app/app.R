@@ -8,7 +8,6 @@
 
 library(shiny)
 library(shinyBS)
-library(shinythemes)
 library(shinyWidgets)
 library(shinyglide)
 library(plotly)
@@ -18,7 +17,6 @@ library(RColorBrewer)
 library(dplyr)
 library(stringr)
 library(tidyr)
-library(emo)
 
 ###### Defining Paths and Importing Data ######
 
@@ -54,10 +52,9 @@ ui <- fluidPage(
   
   div(
     ## heading
-    h1(img(src="img/statue-of-liberty.svg", style="height: 60px; vertical-align: bottom;"),
+    h1(img(src="img/statue-of-liberty.svg", style="height: 50px; vertical-align: bottom;"),
        strong("US Non-Immigrant Visa Explorer"), 
        class="text-title"),
-    get_spacer(15),
    
     ## tabs
     tabsetPanel(
