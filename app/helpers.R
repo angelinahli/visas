@@ -123,12 +123,12 @@ get_plotly_layout <- function(plot, plotly_layout) {
     plot_bgcolor = bg_color,
     paper_bgcolor = bg_color,
     colorway = RColorBrewer::brewer.pal(8, "Set2"),
-    font = list(family = '"Montserrat", "Open Sans", verdana, arial, sans-serif')
+    font = list(family = '"Open Sans", verdana, arial, sans-serif')
   )
   for(var in names(plotly_layout)) {
     l[[var]] <- plotly_layout[[var]]
   }
-  l[["title"]][["font"]] <- list(size = 14)
+  l[["title"]][["font"]] <- list(size = 15)
   return(do.call(plotly::layout, l))
 }
 
