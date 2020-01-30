@@ -37,7 +37,7 @@ analysis_ui_start <- function() {
     
     sidebarLayout(
       sidebarPanel(
-        p("This project explores data on non-immigrant visas in America.", 
+        p("This project explores data on non-immigrant visa issuances in the United States.", 
           br(), br(),
           "This tab shows you which visa categories were issued the most overall.",
           "Try clicking on a column to learn more about that type of visa.",
@@ -114,7 +114,10 @@ analysis_ui_nats <- function() {
     
     sidebarLayout(
       sidebarPanel(
-        p("This tab shows you how many visas were issued across all years,
+        p("The next few charts explore visa issuances across regions and",
+          "nationalities.",
+          br(), br(),
+          "This tab shows you how many visas were issued across all years,
           to people from different nationalities.",
           br(), br(),
           "Change the data selected to see different plots."),

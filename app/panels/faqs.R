@@ -36,7 +36,7 @@ faqs_ui <- function() {
     
     h4("Is this open source? Can I play around with the data?", class="faq-question"),
     p("Yes and yes! You may use this project however you like. To download the data, ",
-      "navigate to Summary > Get the Data, or download the .RDS files directly ",
+      "click on the 'Get the Data' tab, or download the .RDS files directly ",
       "from GitHub."
     ),
     div(class="faq-spacer"),
