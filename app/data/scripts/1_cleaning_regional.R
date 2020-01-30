@@ -49,7 +49,7 @@ import_sheet <- function(filename, sheet_name, year) {
   df[ nationality == "Grand Totals", nationality := "Total" ]
   
   df[ grepl("^Totals for ", nationality), is_total := 1 ]
-  df[ is_total == 1, nationality := paste0(region, " - Total") ]
+  df[ is_total == 1, nationality := region, " - Total") ]
   df[ nationality == "Total", is_total := 1 ]
   
   print(paste0("# rows where grand total != total visas: ", nrow(df[`Grand Total` != `Total Visas`])))
