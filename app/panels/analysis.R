@@ -321,7 +321,7 @@ analysis_server_map <- function(input, output, session) {
     
     subsection <- regional %>% 
       filter(year == selected_year & visa_category == category & !is.na(country_code))
-    
+      
     plot_geo(subsection) %>%
       add_trace(
         z = ~issued, color = ~issued,

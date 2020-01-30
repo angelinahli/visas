@@ -31,11 +31,12 @@ get_visa_select <- function(dt, select_id, multiple=TRUE) {
 }
 
 get_nats_select <- function(select_id, multiple=TRUE) {
- select <- selectInput(
+  selected <- as.character(sort(regional[ is_total == TRUE & nationality != "Total", unique(nationality)]))
+  select <- selectInput(
               select_id, 
               label = "Nationalities",
               choices = as.character(sort(unique(regional$nationality))),
-              selected = as.character(sort(regional[ is_total == TRUE, unique(nationality)])),
+              selected = selected,
               multiple = TRUE)
  return(select)
 }
@@ -102,14 +103,13 @@ get_spacer <- function() {
 }
 
 get_plotly_layout <- function(plot, plotly_layout) {
-  # defines some default attribuets of plotly layout to allow for better standardization
+  # defines some default attributes of plotly layout to allow for better standardization
   bg_color <- "rgba(255, 255, 255, 1)"
   l <- list(
     p = plot,
     plot_bgcolor = bg_color,
     paper_bgcolor = bg_color,
-    colorway = c("#a0e3b7", "#851657", "#3ec349", "#d54db9", "#68c3ef", 
-                 "#2f4285", "#f1b3e3", "#115e41", "#c0e15c", "#4749dc"),
+    colorway = RColorBrewer::brewer.pal(8, "Set2"),
     font = list(family = '"Montserrat", "Open Sans", verdana, arial, sans-serif')
   )
   for(var in names(plotly_layout)) {
