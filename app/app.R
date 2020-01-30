@@ -42,6 +42,9 @@ source(file.path("panels", "downloads.R"), local=TRUE)$value
 ui <- fluidPage(
 
   tags$head(
+    tags$title("US Non-Immigrant Visa Explorer"),
+    tags$meta(name = "description", content = "Exploring data about non-immigrant visa issuances in America"),
+    tags$meta(name = "author", content = "Angelina Li"),
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
     tags$link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Open+Sans&display=swap"),
     tags$link(rel = "icon", type = "image/png", sizes = "16x16", href = "img/favicon-16.png"),
