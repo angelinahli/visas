@@ -31,14 +31,27 @@ get_visa_select <- function(dt, select_id, multiple=TRUE) {
 }
 
 get_nats_select <- function(select_id, multiple=TRUE) {
-  selected <- as.character(sort(regional[ is_total == TRUE & nationality != "Total", unique(nationality)]))
+  selected <- "Total"
+  if(multiple) {
+    selected <- as.character(sort(
+      regional[ is_total == TRUE & nationality != "Total", unique(nationality)]))
+  }
   select <- selectInput(
               select_id, 
-              label = "Nationalities",
+              label = ifelse(multiple, "Regions / Nationalities", "Region / Nationality"),
               choices = as.character(sort(unique(regional$nationality))),
               selected = selected,
-              multiple = TRUE)
+              multiple = multiple)
  return(select)
+}
+
+get_num_cats_slider <- function(slider_id, max_cats=30, value=5) {
+  slider <- sliderInput(slider_id, 
+              "Number of Visa Categories", 
+              min=1, max=max_cats, 
+              value=value,
+              step=1)
+  return(slider)
 }
 
 get_categories_text <- function(cats, limit = 5) {
@@ -98,8 +111,8 @@ get_sorted_categories <- function(cats) {
   return(sort(cats))
 }
 
-get_spacer <- function() {
-  div(style="margin: 10px")
+get_spacer <- function(pixels=10) {
+  div(style=sprintf("margin: %spx", pixels))
 }
 
 get_plotly_layout <- function(plot, plotly_layout) {
@@ -119,17 +132,24 @@ get_plotly_layout <- function(plot, plotly_layout) {
   return(do.call(plotly::layout, l))
 }
 
-get_top_rows <- function(sorted_df, n, cat_col, sum_col) {
-  # returns the top rows of a dataset as well as an 'Other' row
-  top_rows <- head(sorted_df, n)
-  top_rows[[cat_col]] <- as.character(top_rows[[cat_col]])
-  other_count_df <- sorted_df %>%
-    filter(!(get(cat_col) %in% unique(top_rows[[cat_col]]))) %>%
-    summarise(count = sum(!!cat_col))
-  other_row <- list()
-  other_row[[sum_col]] <- other_count_df$count
-  other_row[[cat_col]] <- other_count_df[[cat_col]]
+get_top_visa_rows <- function(filtered_df, n) {
+  # returns the top rows of a dataset by visa_category, as well as an 'Other' row
+  df <- filtered_df %>%
+    filter(visa_category != "Total") %>%
+    select(visa_category, issued) %>%
+    group_by(visa_category) %>%
+    summarise(issued = sum(issued)) %>%
+    arrange(desc(issued))
+  
+  top_rows <- head(df, n)
+  top_rows$visa_category <- as.character(top_rows$visa_category)
+  
+  other_df <- df %>%
+    filter(!(visa_category %in% unique(top_rows$visa_category))) %>%
+    summarise(issued = sum(issued))
+  other_row <- list(visa_category="Other", issued=other_df$issued)
   all_data <- rbind(top_rows, other_row)
-  all_data[[cat_col]] <- factor(all_data[[cat_col]], all_data[[cat_col]])
+  all_data$visa_category <- factor(all_data$visa_category, all_data$visa_category)
+  
   return(all_data)
 }

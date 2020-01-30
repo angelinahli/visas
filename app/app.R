@@ -51,10 +51,10 @@ ui <- fluidPage(
   
   div(
     ## heading
-    h1(img(src="img/statue-of-liberty.svg", style="height: 60px"),
+    h1(img(src="img/statue-of-liberty.svg", style="height: 60px; vertical-align: bottom;"),
        strong("US Non-Immigrant Visa Explorer"), 
        class="text-title"),
-    get_spacer(),
+    get_spacer(15),
    
     ## tabs
     tabsetPanel(
@@ -68,7 +68,7 @@ ui <- fluidPage(
   ),
   
   tags$footer(
-    div("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " in Jan 2020 - ", 
+    div("Created by ", a(href="https://angelinahli.com/", "Angelina Li"), " - Jan 2020 - ", 
       "Icons by ",
       a(href="https://www.flaticon.com/authors/freepik", title="Freepik", "Freepik"),
       " - ",

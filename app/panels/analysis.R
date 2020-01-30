@@ -22,6 +22,7 @@ analysis_ui <- function() {
       analysis_ui_issuances(),
       analysis_ui_workload(),
       analysis_ui_nats(),
+      analysis_ui_nats2(),
       analysis_ui_map(),
       analysis_ui_regional()
     )
@@ -36,15 +37,14 @@ analysis_ui_start <- function() {
     
     sidebarLayout(
       sidebarPanel(
-        p("This project explores data on non-immigrant visas in America.",
-          "Subset the data below to see different plots, and click next to continue."),
+        p("This project explores data on non-immigrant visas in America.", 
+          br(), br(),
+          "This tab shows you which visa categories were issued the most overall.",
+          "Try clicking on a column to learn more about that type of visa.",
+          br(), br(),
+          "Change the data selected to see different plots, and click next to continue."),
         get_year_slider(dt=regional, slider_id="analysis_start_year"),
-        
-        sliderInput("analysis_start_num_cats", 
-                    "Number of Categories", 
-                    min=1, max=30, 
-                    value=5,
-                    step=1)
+        get_num_cats_slider(slider_id="analysis_start_num_cats")
       ),
       mainPanel(
         plotlyOutput("analysis_start_plot")
@@ -60,12 +60,16 @@ analysis_ui_issuances <- function() {
     
     sidebarLayout(
       sidebarPanel(
-        p("Subset the data to see different plots."),
+        p("This tab shows you how the number of visas issued per visa category",
+          "have changed over time.",
+          br(), br(),
+          "Change the data selected to see different plots."),
         get_visa_select(dt=regional, select_id="analysis_issuances_visas"),
         get_year_slider(dt=regional, slider_id="analysis_issuances_year")
       ),
       mainPanel(
-        plotlyOutput("analysis_issuances_plot")
+        plotlyOutput("analysis_issuances_plot"),
+        uiOutput("analysis_issuances_notes")
       )
     )
     
@@ -79,21 +83,21 @@ analysis_ui_workload <- function() {
     
     sidebarLayout(
       sidebarPanel(
-        p("Subset the data to see different plots."),
+        p("This tab shows you how the percentage of visa applications",
+          "issued and granted (either issued, waived or overcome) per",
+          "visa category have changed over time.",
+          br(), br(),
+          "A higher percentage means that a greater proportion of visa",
+          "applicants were successful in acquiring this type of visa.",
+          br(), br(),
+          "Change the data selected to see different plots."),
         get_visa_select(dt=regional, select_id="analysis_workload_visas"),
         get_year_slider(dt=workload, slider_id="analysis_workload_year"),
         selectInput("analysis_workload_stats", 
                     label = "Comparison Measure",
                     choices = c(WORKLOAD_ISSUED_OPTION, WORKLOAD_GRANTED_OPTION),
                     selected = c(WORKLOAD_ISSUED_OPTION, WORKLOAD_GRANTED_OPTION),
-                    multiple = TRUE),
-        p(
-          "The % of applications issued is the number of applications issued",
-          "over the total number of applications processed.",
-          br(), br(),
-          "The % of applications granted is the number of applications issued",
-          "waived or overcome over the total number of applications processed.",
-        )
+                    multiple = TRUE)
       ),
       mainPanel(
         plotlyOutput("analysis_workload_plot"),
@@ -103,33 +107,17 @@ analysis_ui_workload <- function() {
   )
 }
 
-analysis_ui_map <- function() {
-  screen(
-    h4("Visas Issued By Country and Year"),
-    get_spacer(),
-    
-    sidebarLayout(
-      sidebarPanel(
-        p("Subset the data to see different maps."),
-        get_visa_select(dt=regional, select_id="analysis_map_visas", multiple=F),
-        get_year_slider(dt=regional, slider_id="analysis_map_year", multiple=F)
-      ),
-      mainPanel(
-        plotlyOutput("analysis_map_plot"),
-        uiOutput("analysis_map_notes")
-      )
-    )
-  )
-}
-
 analysis_ui_nats <- function() {
   screen(
-    h4("Overall Visas Issued By Country"),
+    h4("Overall Visas Issued Across Regions / Nationalities"),
     get_spacer(),
     
     sidebarLayout(
       sidebarPanel(
-        p("Subset the data to see different plots."),
+        p("This tab shows you how many visas were issued across all years,
+          to people from different nationalities.",
+          br(), br(),
+          "Change the data selected to see different plots."),
         get_visa_select(dt=regional, select_id="analysis_nats_visas", multiple=F),
         get_year_slider(dt=regional, slider_id="analysis_nats_year", multiple=T),
         get_nats_select(select_id="analysis_nats_nats")
@@ -142,14 +130,61 @@ analysis_ui_nats <- function() {
   )
 }
 
-analysis_ui_regional <- function() {
+analysis_ui_nats2 <- function() {
   screen(
-    h4("Changes in Visas Issued By Country Over Time"),
+    h4("Top Visa Categories Per Region / Nationality"),
     get_spacer(),
     
     sidebarLayout(
       sidebarPanel(
-        p("Subset the data to see different plots."),
+        p("This tab shows you which visa categories were issued the most to ",
+          "people from a particular nationality.",
+          br(), br(),
+          "Change the data selected to see different plots."),
+        get_year_slider(dt=regional, slider_id="analysis_nats2_year"),
+        get_nats_select(select_id="analysis_nats2_nats", multiple=F),
+        get_num_cats_slider(slider_id="analysis_nats2_num_cats")
+      ),
+      mainPanel(
+        plotlyOutput("analysis_nats2_plot")
+      )
+    )
+  )
+}
+
+analysis_ui_map <- function() {
+  screen(
+    h4("Visas Issued Per Year Across Regions / Nationalities"),
+    get_spacer(),
+    
+    sidebarLayout(
+      sidebarPanel(
+        p("This tab shows you how many visas were issued in a particular year,
+          to people from different nationalities.",
+          br(), br(),
+          "Change the data selected to see different plots."),
+        get_visa_select(dt=regional, select_id="analysis_map_visas", multiple=F),
+        get_year_slider(dt=regional, slider_id="analysis_map_year", multiple=F)
+      ),
+      mainPanel(
+        plotlyOutput("analysis_map_plot"),
+        uiOutput("analysis_map_notes")
+      )
+    )
+  )
+}
+
+analysis_ui_regional <- function() {
+  screen(
+    h4("Changes in Visas Issued Across Regions / Nationalities Over Time"),
+    get_spacer(),
+    
+    sidebarLayout(
+      sidebarPanel(
+        p("This tab shows you how the number of visas issued to people from ",
+          "different nationalities has changed over time.",
+          br(), br(),
+          "Subset the data to see different plots."),
         get_visa_select(dt=regional, select_id="analysis_regional_visas", multiple=F),
         get_year_slider(dt=regional, slider_id="analysis_regional_year"),
         get_nats_select(select_id="analysis_regional_nats")
@@ -168,8 +203,9 @@ analysis_server <- function(input, output, session) {
   analysis_server_start(input, output, session)
   analysis_server_issuances(input, output, session)
   analysis_server_workload(input, output, session)
-  analysis_server_map(input, output, session)
   analysis_server_nats(input, output, session)
+  analysis_server_nats2(input, output, session)
+  analysis_server_map(input, output, session)
   analysis_server_regional(input, output, session)
 }
 
@@ -180,30 +216,17 @@ analysis_server_start <- function(input, output, session) {
     year_max <- input$analysis_start_year[2]
     num_categories <- input$analysis_start_num_cats
 
-    grouped <- regional %>%
-      dplyr::filter(year >= year_min & year <= year_max & region == "Total") %>%
-      select(visa_category, issued) %>%
-      group_by(visa_category) %>%
-      summarise(issued = sum(issued)) %>%
-      arrange(desc(issued))
-
-    top_rows <- head(grouped, num_categories + 1)
-    top_rows$visa_category <- as.character(top_rows$visa_category)
-    other_count_df <- grouped %>%
-      filter(!(visa_category %in% unique(top_rows$visa_category))) %>%
-      summarise(issued = sum(issued))
-    other_row <- list(visa_category="Other", issued=other_count_df$issued)
-    all_data <- rbind(top_rows, other_row)
-
-    # order:
-    all_data$visa_category <- factor(all_data$visa_category, all_data$visa_category)
+    filtered_df <- regional %>%
+      dplyr::filter(year >= year_min & year <= year_max & region == "Total")
+      
+    all_data <- get_top_visa_rows(filtered_df, num_categories)
 
     plot_ly(type = "bar", data = all_data,
             x = ~visa_category, y = ~issued, color = ~visa_category,
             text = unlist(lapply(as.character(all_data$visa_category), get_label))) %>%
     get_plotly_layout(list(
       title = list(text = sprintf(
-        "Overall Number of Visas Issued for Top %s Categories<br>%s-%s", num_categories, year_min, year_max)),
+        "Overall Number of Visas Issued for Top %s Visa Categories<br>%s-%s", num_categories, year_min, year_max)),
       yaxis = list(title = "# Issuances"),
       xaxis = list(title = "Visa Category"),
       hovermode = "compare"))
@@ -241,6 +264,17 @@ analysis_server_issuances <- function(input, output, session) {
 
     plot
   })
+  output$analysis_issuances_notes <- renderUI({
+    categories <- input$analysis_issuances_visas
+    if(length(categories) <= 5) {
+      get_notes_html(visa_categories = categories)
+    } else {
+      get_notes_html(additional_notes = c(
+        paste("For a description of each visa category, click into the",
+              "'Visa Categories' tab.")
+      ))
+    }
+  })
 }
 
 analysis_server_workload <- function(input, output, session) {
@@ -271,8 +305,8 @@ analysis_server_workload <- function(input, output, session) {
       stats_text <- ifelse(length(stats) == 0, 
                            "Issued", 
                            paste0(str_replace_all(stats, "% ", ""), collapse = " and "))
-      title <- sprintf("Percentage of %s Applications %s<br>%s-%s<br>",
-                       get_categories_text(categories),
+      title <- sprintf("Percentage of %s Visa Applications %s<br>%s-%s<br>",
+                       get_categories_text(categories, limit = 3),
                        stats_text,
                        year_min, year_max)
       
@@ -304,38 +338,24 @@ analysis_server_workload <- function(input, output, session) {
     }
   })
   output$analysis_workload_notes <- renderUI({
-    get_notes_html(
-      additional_notes = c(
-        paste0("Note that applications may be waived or ",
-               "overcome in a different fiscal year from when they were first ",
-               "processed. Thus, the percentage of applications granted may exceed ",
-               "100% in a given year, and is meant as an estimation only."))
-      )
-  })
-}
-
-analysis_server_map <- function(input, output, session) {
-  output$analysis_map_plot <- renderPlotly({
-    selected_year <- input$analysis_map_year
-    category <- input$analysis_map_visas
+    categories <- c()
+    additional_notes <- c(
+      paste0("Applications may be waived or ",
+             "overcome in a different fiscal year from when they were first ",
+             "processed. Thus, the percentage of applications granted may exceed ",
+             "100% in a given year, and is meant as an estimation only."))
     
-    subsection <- regional %>% 
-      filter(year == selected_year & visa_category == category & !is.na(country_code))
-      
-    plot_geo(subsection) %>%
-      add_trace(
-        z = ~issued, color = ~issued,
-        text = ~nationality, locations = ~country_code,
-        colorscale = "Portland") %>%
-      colorbar(title = "# Issuances") %>%
-      get_plotly_layout(list(
-        title = list(text = sprintf("%s Visa Issuances in %s", category, selected_year)),
-        geo = list(projection = list(type = "winkel tripel")),
-        margin = list(l = 20, r = 20, b = 0, t = 50, pad = 2)
-      ))
-  })
-  output$analysis_map_notes <- renderUI({
-    get_notes_html(visa_categories = input$analysis_map_visas)
+    if(length(input$analysis_workload_visas) <= 5) {
+      categories <- input$analysis_workload_visas
+    } else {
+      additional_notes <- c(
+        additional_notes,
+        paste("For a description of each visa category, click into the",
+              "'Visa Categories' tab.")
+      )
+    }
+    
+    get_notes_html(visa_categories = categories, additional_notes = additional_notes)
   })
 }
 
@@ -368,6 +388,60 @@ analysis_server_nats <- function(input, output, session) {
   })
 }
 
+analysis_server_nats2 <- function(input, output, session) {
+  output$analysis_nats2_plot <- renderPlotly({
+    ## parse input vars
+    year_min <- input$analysis_nats2_year[1]
+    year_max <- input$analysis_nats2_year[2]
+    nat <- input$analysis_nats2_nats
+    num_categories <- input$analysis_nats2_num_cats
+    
+    filtered_df <- regional %>%
+      filter(year >= year_min & year <= year_max & nationality == nat)
+    
+    all_data <- get_top_visa_rows(filtered_df, num_categories)
+    
+    plot_ly(type = "bar", data = all_data,
+            x = ~visa_category, y = ~issued, color = ~visa_category,
+            text = unlist(lapply(as.character(all_data$visa_category), get_label))) %>%
+      get_plotly_layout(list(
+        title = list(text = sprintf(
+          "Top %s Visas Issued for Persons from %s<br>%s-%s", 
+          num_categories, 
+          ifelse(nat == "Total", "All Nationalities", nat), 
+          year_min, 
+          year_max)),
+        yaxis = list(title = "# Issuances"),
+        xaxis = list(title = "Visa Category"),
+        hovermode = "compare"))
+  })
+}
+
+analysis_server_map <- function(input, output, session) {
+  output$analysis_map_plot <- renderPlotly({
+    selected_year <- input$analysis_map_year
+    category <- input$analysis_map_visas
+    
+    subsection <- regional %>% 
+      filter(year == selected_year & visa_category == category & !is.na(country_code))
+      
+    plot_geo(subsection) %>%
+      add_trace(
+        z = ~issued, color = ~issued,
+        text = ~nationality, locations = ~country_code,
+        colorscale = "Portland") %>%
+      colorbar(title = "# Issuances") %>%
+      get_plotly_layout(list(
+        title = list(text = sprintf("%s Visa Issuances in %s", category, selected_year)),
+        geo = list(projection = list(type = "winkel tripel")),
+        margin = list(l = 20, r = 20, b = 0, t = 50, pad = 2)
+      ))
+  })
+  output$analysis_map_notes <- renderUI({
+    get_notes_html(visa_categories = input$analysis_map_visas)
+  })
+}
+
 analysis_server_regional <- function(input, output, session) {
   output$analysis_regional_plot <- renderPlotly({
     year_min <- input$analysis_regional_year[1]
@@ -386,12 +460,13 @@ analysis_server_regional <- function(input, output, session) {
     
     nat_title <- "Selected Nationalities"
     if(length(nationalities) == 1) {
-      if(nationalities[1] == "Total") { nat_title <- "All Nationalities" }
-      else { nat_title <- paste0("Applicants from ", nationalities[1]) }
+      nat_title <- ifelse(nationalities[1] == "Total",
+                          "All Nationalities",
+                          paste0("Persons from ", nationalities[1]))
     }
     plot <- plot_ly() %>%
       get_plotly_layout(list(
-        title = list(text = sprintf("%s Visa Issuances for %s<br>%s-%s", 
+        title = list(text = sprintf("%s Visas Issued for %s<br>%s-%s", 
                                     category, nat_title, year_min, year_max)),
         yaxis = list(title = "# Issuances"),
         xaxis = list(title = "Year"),
