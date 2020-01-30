@@ -5,28 +5,6 @@ Did you know that the US Travel Department releases statistics on the [processin
 
 I'm making this app to satisfy my own desire to explore and tinker with this data in an interactive way.
 
-### Alpha version notes and to dos
-
-* Overarching:
-    * Make the app overall easier to use
-
-### R Shiny Graph Ideas
-
-* Summary
-    * Initial visa documentation detailing what each visa means
-    * Download datasets for your own purposes
-* Overall Issuances 
-    * Over all years, total number of issuances per visa category (bar graph)
-    * Number of issuances per visa category and year, including an overall category (line graph)
-    * Table of total issuances per visa category, per year
-* Issuances and Refusals
-    * Proportion of applications issued and either issued, waved or overcome, per category and year
-    * Table of proportion issued and issued/waived/overcome, per visa category and year
-* Issuances Per Country
-    * Number of issuances in all countries, given a category and year (sliding scale)
-    * Animated version of the above? See [this link](https://rstudio-pubs-static.s3.amazonaws.com/315157_73b802e0532c4ea3839f98afc0378ca1.html).
-    * Table of issuances per country / year
-
 ### Data Documentation
 
 #### (0) Overall Cleaning Steps

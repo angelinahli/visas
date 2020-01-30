@@ -140,6 +140,11 @@ region_levels <- c("Africa", "Asia", "Europe", "North America", "Oceania",
 regional$region <- factor(regional$region, region_levels)
 regional$Alpha.3.code <- factor(regional$Alpha.3.code)
 
+# patch nationality names to remove - Total
+nat_order <- as.character(sort(unique(regional$nationality)))
+nat_order <- gsub(" - Total$", "", nat_order)
+regional$nationality <- factor(gsub(" - Total$", "", regional$nationality), nat_order)
+
 ###### Reorder and relabel datasets ######
 
 labels <- labels[ , c("Visa.Category", "Short.Description", "Source") ]
