@@ -43,7 +43,6 @@ ui <- fluidPage(
 
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
-    tags$link(rel = "stylsheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Montserrat|Open+Sans&display=swap"),
     tags$link(rel = "icon", type = "image/png", sizes = "16x16", href = "img/favicon-16.png"),
     tags$link(rel = "icon", type = "image/png", sizes = "32x32", href = "img/favicon-32.png"),
     tags$link(rel = "icon", type = "image/png", sizes = "96x96", href = "img/favicon-96.png")
@@ -74,7 +73,7 @@ ui <- fluidPage(
       " - ",
       a(href="https://github.com/angelinahli/visas/", "Source code"),
       class="text-grey", style="font-size: 15px"))
-)
+  )
 
 ###### Defining Server ######
 
